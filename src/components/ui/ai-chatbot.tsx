@@ -84,17 +84,17 @@ export function AIChatbot() {
       } else {
         throw new Error(data.error || 'Failed to get response')
       }
-    } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: "I apologize, but I'm experiencing technical difficulties. Please contact our team directly at +1 (555) 123-4567 or info@quadtechsolutions.com for immediate assistance.",
-        timestamp: new Date().toISOString()
+      } catch (err) {
+        console.error('Error sending message:', err)
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: "I apologize, but I'm experiencing technical difficulties. Please try again later or contact our support team directly.",
+          timestamp: new Date().toISOString()
+        }])
+      } finally {
+        setIsLoading(false)
       }
-      setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

@@ -112,7 +112,7 @@ export function AboutTeam() {
               <span className="gradient-text">Remote Work Excellence</span>
             </h3>
             <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
-              We've embraced the flexibility of remote work, leveraging talented teams across multiple locations 
+              We&apos;ve embraced the flexibility of remote work, leveraging talented teams across multiple locations 
               to provide comprehensive coverage and expertise.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

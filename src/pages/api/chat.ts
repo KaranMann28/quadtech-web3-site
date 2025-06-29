@@ -51,7 +51,7 @@ export default async function handler(
     // Build conversation context
     let conversationContext = SYSTEM_PROMPT + '\n\nCONVERSATION HISTORY:\n'
     
-    conversationHistory.forEach((msg: any, index: number) => {
+    conversationHistory.forEach((msg: any) => {
       conversationContext += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n`
     })
     

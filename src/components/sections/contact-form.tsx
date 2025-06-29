@@ -45,7 +45,7 @@ export function ContactForm() {
                   <span className="gradient-text">Send us a Message</span>
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  Fill out the form below and we'll get back to you within 24 hours.
+                  Fill out the form below and we&apos;ll get back to you within 24 hours.
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-0">

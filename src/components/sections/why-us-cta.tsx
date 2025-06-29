@@ -31,8 +31,8 @@ export function WhyUsCTA() {
               Ready to Experience the <span className="gradient-text">QuadTech Difference</span>?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Join hundreds of satisfied clients who trust us with their most critical 
-              telecom and IT infrastructure needs. Let's build something extraordinary together.
+              Ready to experience the QuadTech difference? Let&apos;s discuss how our proven expertise 
+              and innovative solutions can transform your network infrastructure.
             </p>
 
             {/* Benefits Grid */}
