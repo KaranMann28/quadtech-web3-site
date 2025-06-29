@@ -1,40 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# QuadTech Solutions Website
 
-## Getting Started
+A modern, responsive website for QuadTech Solutions - a premier Telecom & IT company specializing in network infrastructure solutions.
 
-First, run the development server:
+## 🚀 Features
 
+- **Modern Design**: Glass morphism UI with smooth animations
+- **Responsive**: Mobile-first design that works on all devices
+- **AI Chatbot**: 24/7 AI Network Consultant powered by Google Gemini
+- **Performance**: Optimized for speed and SEO
+- **TypeScript**: Full type safety throughout the application
+
+## 🤖 AI Network Consultant
+
+The website includes an intelligent AI chatbot that provides:
+- Technical consultation on network infrastructure
+- Lead qualification and generation
+- 24/7 customer support
+- Expert guidance on telecom solutions
+
+**⚠️ Important**: The AI chatbot requires a Google Gemini API key to function. See [DEPLOYMENT.md](./DEPLOYMENT.md) for setup instructions.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 with Pages Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **AI**: Google Gemini 1.5 Flash
+- **Icons**: Lucide React
+- **Deployment**: Vercel
+
+## 📦 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd quadtech-web3-site
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+4. Add your Google Gemini API key to `.env.local`:
+```
+GEMINI_API_KEY=your_actual_api_key_here
+```
+
+5. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) to view the website.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## 🚀 Deployment
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Vercel (Recommended)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+1. Deploy to Vercel using the [Vercel Platform](https://vercel.com/new)
+2. Set up the `GEMINI_API_KEY` environment variable in Vercel dashboard
+3. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Other Platforms
 
-## Learn More
+The application can be deployed to any platform that supports Next.js:
+- Netlify
+- AWS Amplify
+- Railway
+- Render
 
-To learn more about Next.js, take a look at the following resources:
+Make sure to set the `GEMINI_API_KEY` environment variable on your chosen platform.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── components/
+│   ├── ui/              # Reusable UI components
+│   ├── sections/        # Page sections
+│   └── layout/          # Layout components
+├── pages/
+│   ├── api/             # API routes
+│   └── *.tsx            # Page components
+├── styles/              # Global styles
+└── lib/                 # Utility functions
+```
 
-## Deploy on Vercel
+## 🔧 Available Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript compiler
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📄 License
+
+This project is proprietary and confidential.
+
+## 🆘 Support
+
+For deployment issues or questions about the AI chatbot setup, refer to:
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Detailed deployment guide
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Vercel Documentation](https://vercel.com/docs)
+
+## 📞 Contact
+
+QuadTech Solutions
+- Website: [quadtechsolutions.com](https://quadtechsolutions.com)
+- Email: info@quadtechsolutions.com
+- Phone: +1 (555) 123-4567
