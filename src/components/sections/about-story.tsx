@@ -23,10 +23,10 @@ export function AboutStory() {
             </h2>
             <div className="prose prose-lg max-w-none text-muted-foreground">
               <p className="text-lg leading-relaxed mb-6">
-                Established in <span className="text-accent font-semibold">2012</span>, we pride ourselves on being a premier Telecom & IT company committed to delivering top-notch Engineering Infrastructure Solutions and Services. Over the past <span className="text-accent font-semibold">twelve years</span>, we've experienced rapid growth and are currently serving clients across the <span className="text-accent font-semibold">United States and Canada</span>.
+                Established in <span className="text-accent font-semibold">2012</span>, we pride ourselves on being a premier Telecom & IT company committed to delivering top-notch Engineering Infrastructure Solutions and Services. Over the past <span className="text-accent font-semibold">twelve years</span>, we&apos;ve experienced rapid growth and are currently serving clients across the <span className="text-accent font-semibold">United States and Canada</span>.
               </p>
               <p className="text-lg leading-relaxed mb-6">
-                With offices in <span className="text-accent font-semibold">Maryland, United States</span>, and <span className="text-accent font-semibold">Ontario, Canada</span>, we've also embraced the flexibility of remote work, leveraging teams located in <span className="text-accent font-semibold">California, the Greater Toronto Area, Montreal, and Calgary</span>.
+                With offices in <span className="text-accent font-semibold">Maryland, United States</span>, and <span className="text-accent font-semibold">Ontario, Canada</span>, we&apos;ve also embraced the flexibility of remote work, leveraging teams located in <span className="text-accent font-semibold">California, the Greater Toronto Area, Montreal, and Calgary</span>.
               </p>
               <p className="text-lg leading-relaxed">
                 Our team comprises highly skilled and dedicated professionals with extensive experience in the Telecom & IT industry. We are passionate about providing <span className="text-accent font-semibold">innovative, powerful, and strategic methodologies</span> to deliver cost-effective Telecom and Infrastructure solutions.
@@ -61,7 +61,7 @@ export function AboutStory() {
               {
                 icon: Award,
                 title: "Reliability",
-                description: "With over a decade of experience, we've built a reputation for delivering reliable, cost-effective solutions that our clients can depend on."
+                description: "With over a decade of experience, we&apos;ve built a reputation for delivering reliable, cost-effective solutions that our clients can depend on."
               }
             ].map((value, index) => (
               <motion.div
@@ -102,7 +102,7 @@ export function AboutStory() {
               <span className="gradient-text">Our Expertise</span>
             </h3>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
-              Within our Telecom group, we specialize in <span className="text-accent font-semibold">Wireless and Wireline Network Design, Optimization, Switching, and Troubleshooting</span>. Whether you're seeking to enhance an existing network or address complex challenges, our expertise ensures tailored solutions that meet your specific needs and exceed expectations.
+              Within our Telecom group, we specialize in <span className="text-accent font-semibold">Wireless and Wireline Network Design, Optimization, Switching, and Troubleshooting</span>. Whether you&apos;re seeking to enhance an existing network or address complex challenges, our expertise ensures tailored solutions that meet your specific needs and exceed expectations.
             </p>
           </div>
         </motion.div>
