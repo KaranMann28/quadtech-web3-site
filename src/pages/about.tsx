@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Layout } from "@/components/layout/layout";
 import { AboutHero } from "@/components/sections/about-hero";
 import { AboutStory } from "@/components/sections/about-story";
+import { VisionMission } from "@/components/sections/vision-mission";
 import { AboutTeam } from "@/components/sections/about-team";
 
 const geistSans = Geist({
@@ -20,6 +21,7 @@ export default function About() {
       <Layout>
         <AboutHero />
         <AboutStory />
+        <VisionMission />
         <AboutTeam />
       </Layout>
     </div>

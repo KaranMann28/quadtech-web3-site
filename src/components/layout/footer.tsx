@@ -1,6 +1,6 @@
 import React from "react"
 import Link from "next/link"
-import { Zap, Mail, Phone, MapPin, Linkedin, Twitter } from "lucide-react"
+import { Zap, Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const navigation = {
@@ -18,7 +18,19 @@ const navigation = {
     { name: "Network Optimization", href: "/services#optimization" },
     { name: "Troubleshooting", href: "/services#troubleshooting" },
   ],
+  resources: [
+    { name: "Blog", href: "/blog" },
+    { name: "Whitepapers", href: "/resources/whitepapers" },
+    { name: "Case Studies", href: "/resources/case-studies" },
+    { name: "Service Brochure", href: "/resources/brochure" },
+    { name: "Industry Insights", href: "/resources/insights" },
+  ],
   social: [
+    {
+      name: "Facebook",
+      href: "#",
+      icon: Facebook,
+    },
     {
       name: "LinkedIn",
       href: "#",
@@ -38,7 +50,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Company Info */}
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center space-x-2 group mb-4">
@@ -96,6 +108,25 @@ export function Footer() {
               </h3>
               <ul className="space-y-2">
                 {navigation.services.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-sm text-muted-foreground hover:text-accent transition-colors duration-300"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+                Resources
+              </h3>
+              <ul className="space-y-2">
+                {navigation.resources.map((item) => (
                   <li key={item.name}>
                     <Link
                       href={item.href}

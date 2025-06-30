@@ -3,6 +3,7 @@
 import React from "react"
 import { motion } from "framer-motion"
 import { Building2, Users, Globe } from "lucide-react"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
 
 export function AboutHero() {
   return (
@@ -16,10 +17,18 @@ export function AboutHero() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Breadcrumb items={[{ label: "About us" }]} />
+        </motion.div>
+
+        <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             <span className="gradient-text">About QuadTech</span>
