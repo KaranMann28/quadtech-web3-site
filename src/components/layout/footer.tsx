@@ -1,7 +1,8 @@
 import React from "react"
 import Link from "next/link"
-import { Zap, Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from "lucide-react"
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { QuadTechLogo } from "@/components/ui/quadtech-logo"
 
 const navigation = {
   main: [
@@ -53,9 +54,12 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Company Info */}
             <div className="lg:col-span-2">
-              <Link href="/" className="flex items-center space-x-2 group mb-4">
+              <Link href="/" className="flex items-center space-x-3 group mb-4">
                 <div className="relative">
-                  <Zap className="h-8 w-8 text-accent group-hover:text-primary transition-colors duration-300" />
+                  <QuadTechLogo 
+                    size={32} 
+                    className="text-accent group-hover:text-primary transition-colors duration-300" 
+                  />
                   <div className="absolute inset-0 bg-accent/20 rounded-full blur-lg group-hover:bg-primary/20 transition-all duration-300" />
                 </div>
                 <span className="text-xl font-bold gradient-text">

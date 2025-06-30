@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Zap } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { QuadTechLogo } from "@/components/ui/quadtech-logo"
 import { cn } from "@/lib/utils"
 
 const navigation = [
@@ -41,9 +42,12 @@ export function Header() {
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
+          <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
-              <Zap className="h-8 w-8 text-accent group-hover:text-primary transition-colors duration-300" />
+              <QuadTechLogo 
+                size={32} 
+                className="text-accent group-hover:text-primary transition-colors duration-300" 
+              />
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-lg group-hover:bg-primary/20 transition-all duration-300" />
             </div>
             <span className="text-xl font-bold gradient-text">
