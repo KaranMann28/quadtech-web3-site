@@ -1,78 +1,86 @@
-# 🚀 Deployment Guide - AI Chatbot Setup
+# Deployment Guide
 
-## Environment Variables Required
+## Custom domain (Vercel)
 
-The AI chatbot requires a Google Gemini API key to function. Follow these steps to set it up:
+1. Purchase the domain in the Vercel dashboard: [Search quadtechsolutions.io](https://vercel.com/domains/search?q=quadtechsolutions.io) (price shown at checkout; verify current pricing there).
+2. In your Vercel project, open **Settings → Domains** and add `quadtechsolutions.io` and `www.quadtechsolutions.io` if you use both.
+3. Vercel provisions DNS and SSL automatically for domains bought through Vercel.
 
-### 1. Get Google Gemini API Key
+### Microsoft 365 and the website domain
+
+- **Website only on `.io`:** No change to Microsoft 365 is required. The contact form sends mail **to** your existing Microsoft inbox via Resend (see below).
+- **Mailboxes at `@quadtechsolutions.io`:** Add the domain in [Microsoft 365 admin center](https://admin.microsoft.com) → **Settings → Domains**, then copy the required **MX**, **TXT (SPF)**, **DKIM**, and **Autodiscover** records into **Vercel → Domains → your domain → DNS**. Microsoft’s wizard lists exact values.
+
+---
+
+## Environment variables
+
+### Production (Vercel)
+
+In **Project → Settings → Environment Variables**, add each variable for **Production**, **Preview**, and **Development** as needed:
+
+| Name | Purpose |
+|------|---------|
+| `GEMINI_API_KEY` | Powers the AI chatbot (`/api/chat`). |
+| `RESEND_API_KEY` | Sends contact form email via [Resend](https://resend.com). Create a free account and an API key. |
+| `CONTACT_EMAIL` | **Microsoft 365 (or any) inbox** that receives contact form submissions — e.g. `info@quadtechsolutions.com` or your work email. |
+| `RESEND_FROM` | *(Optional)* Verified sender, e.g. `QuadTech Solutions <noreply@your-verified-domain.com>`. Until you verify a domain in Resend, omit this; the default `QuadTech Solutions <onboarding@resend.dev>` is used for testing. |
+
+After changing variables, trigger a **Redeploy** so serverless functions pick up new values.
+
+### Local development
+
+Create `.env.local` in the project root (never commit it):
+
+```bash
+GEMINI_API_KEY=your_gemini_key
+RESEND_API_KEY=your_resend_key
+CONTACT_EMAIL=you@yourcompany.com
+# Optional after verifying a domain in Resend:
+# RESEND_FROM="QuadTech Solutions <noreply@yourdomain.com>"
+```
+
+---
+
+## AI chatbot (Gemini)
+
+### Get an API key
 
 1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the generated API key
+3. Click **Create API Key**
+4. Copy the key into `GEMINI_API_KEY` in Vercel or `.env.local`
 
-### 2. Configure Environment Variables
+### Troubleshooting
 
-#### For Vercel Deployment:
+If the chatbot shows a generic error:
 
-1. Go to your Vercel dashboard
-2. Select your project
-3. Go to Settings → Environment Variables
-4. Add a new environment variable:
-   - **Name**: `GEMINI_API_KEY`
-   - **Value**: Your Google Gemini API key
-   - **Environment**: Production, Preview, Development (select all)
-5. Click "Save"
-6. Redeploy your application
+- `GEMINI_API_KEY` is missing or invalid in Vercel
+- Network issue reaching Google’s API
+- Check **Functions** logs in the Vercel deployment
 
-#### For Local Development:
+---
 
-1. Copy `.env.example` to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-2. Edit `.env.local` and replace `your_gemini_api_key_here` with your actual API key:
-   ```
-   GEMINI_API_KEY=your_actual_api_key_here
-   ```
+## Contact form email (Resend → Microsoft 365)
 
-### 3. Verify Setup
+The contact form posts to `/api/contact`, which uses Resend to deliver email **to** `CONTACT_EMAIL`. Set `CONTACT_EMAIL` to the Outlook / Microsoft 365 mailbox where your team reads inquiries.
 
-After setting up the environment variable:
+1. Sign up at [resend.com](https://resend.com) and create an API key.
+2. Add `RESEND_API_KEY` and `CONTACT_EMAIL` in Vercel (and redeploy).
+3. Submit the contact form on the live site and confirm delivery in Outlook.
 
-1. **Local Testing**: Run `npm run dev` and test the chatbot
-2. **Production Testing**: Deploy to Vercel and test the chatbot on your live site
+When you verify your domain in Resend, optionally set `RESEND_FROM` for branded sender addresses.
 
-### 4. Troubleshooting
+---
 
-If you see the error: `"Sorry, I encountered an error. Please try again or contact our team directly at +1 (555) 123-4567."`
+## Security notes
 
-This means:
-- The `GEMINI_API_KEY` environment variable is not set
-- The API key is invalid
-- There's a network issue with Google's API
+- Never commit API keys.
+- Use environment variables only.
+- Rotate keys periodically.
 
-**Solutions:**
-1. Double-check the environment variable is set correctly in Vercel
-2. Verify your API key is valid by testing it locally first
-3. Ensure you have billing enabled on your Google Cloud account (if required)
-4. Check the Vercel function logs for more detailed error messages
+## References
 
-### 5. API Usage and Costs
-
-- Google Gemini 1.5 Flash has generous free tier limits
-- Monitor your usage in Google AI Studio
-- Consider setting up usage alerts if needed
-
-## Security Notes
-
-- Never commit API keys to your repository
-- Use environment variables for all sensitive data
-- The `.env.local` file is already in `.gitignore`
-- Rotate API keys periodically for security
-
-## Support
-
-If you need help with deployment, contact the development team or refer to:
-- [Vercel Environment Variables Documentation](https://vercel.com/docs/concepts/projects/environment-variables)
-- [Google AI Studio Documentation](https://ai.google.dev/docs)
+- [Vercel Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
+- [Google AI Studio](https://ai.google.dev/docs)
+- [Resend Docs](https://resend.com/docs)
