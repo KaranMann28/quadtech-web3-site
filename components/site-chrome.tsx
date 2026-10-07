@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { AIChatbot } from "@/components/ai-chatbot";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -16,6 +17,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <SiteFooter />
+      <AIChatbot />
     </>
   );
 }

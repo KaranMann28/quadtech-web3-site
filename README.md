@@ -21,6 +21,8 @@ npm run build
 
 Copy `.env.example` to `.env`. Local SQLite is `DATABASE_URL="file:./data/portal.db"`. Production on Vercel uses Neon Postgres; a leftover `file:` URL is ignored when any `postgres://` URL is present.
 
+The chat widget on public pages calls Gemini through `/api/chat` when `GEMINI_API_KEY` is set. Without the key the widget still renders and replies with an offline message.
+
 Applications are stored in the database even when SMTP is not set. HR email is sent when `APPLY_SMTP_*` or `RESEND_API_KEY` is configured. Résumés go to `data/resumes/` locally, to the Application row on Vercel, or to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set.
 
 ```bash

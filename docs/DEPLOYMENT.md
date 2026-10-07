@@ -11,7 +11,7 @@ Do not create paid stores. Neon Hobby (`quadtech-portal`, iad1) is attached via 
 - App Router site in this repository: marketing pages, `/careers`, `/admin`, apply APIs.
 - Contact form: Resend when `RESEND_API_KEY` is set (same pattern as the previous GitHub site), otherwise `APPLY_SMTP_*`.
 - Applications are written to Neon first. HR email is sent when `APPLY_SMTP_*` or `RESEND_API_KEY` is set. Missing mail config no longer blocks the inbox row.
-- The previous Pages Router Gemini chatbot was not copied. `GEMINI_API_KEY` remains on the Vercel project unused until a new chatbot is written against confirmed facts.
+- The Gemini chatbot from the previous Pages Router site is ported as `components/ai-chatbot.tsx` plus `app/api/chat/route.ts` (REST call, no SDK). It reads `GEMINI_API_KEY` (already set on the Vercel project) and optional `GEMINI_MODEL` (default `gemini-flash-latest`; the old `gemini-1.5-flash` is retired). The prompt states only the confirmed facts in `lib/company.ts` and `lib/services.ts` and points visitors at `/contact` — the old prompt's placeholder phone number and unconfirmed inbox were dropped.
 - Ignore Neon Auth vars (`NEON_AUTH_BASE_URL`, `VITE_NEON_AUTH_URL`). Admin sign-in is Entra via Auth.js.
 
 ## Postgres (Neon)
