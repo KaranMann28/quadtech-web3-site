@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local portal data
+/data/*.db
+/data/*.db-*
+/data/resumes/
+/data/auth-links.log
