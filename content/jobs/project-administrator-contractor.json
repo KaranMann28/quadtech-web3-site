@@ -1,0 +1,41 @@
+{
+  "slug": "project-administrator-contractor-2026-003",
+  "jobId": "QT-JOB-2026-003",
+  "title": "Project Administrator (Contractor)",
+  "serviceLine": "Project Management",
+  "industry": "wireless-carriers-oems",
+  "location": {
+    "city": "Remote",
+    "region": "Canada",
+    "country": "CA",
+    "mode": "Remote"
+  },
+  "type": "Contract",
+  "postedDate": "2026-10-06",
+  "summary": "Contractor project administrator supporting Bell service delivery in Canada. Coordinate order management, cutovers, and post-implementation reporting for a Project Manager, with a path toward project management.",
+  "responsibilities": [
+    "Manage the administrative lifecycle of project orders, including data and voice services, IT changes, and hardware.",
+    "Initiate change requests in client and internal platforms, coordinate equipment shipping, and confirm implementation prerequisites.",
+    "Act as central coordination during service implementation and cutovers.",
+    "Establish and manage virtual collaboration bridges on Microsoft Teams or Webex.",
+    "Guide teams through the Method of Procedure and oversee service testing for a smooth transition to new Bell services.",
+    "Validate billing actions such as activations and cessations after implementation.",
+    "Close order records with data integrity, track progress, report status, and escalate issues to the Project Manager."
+  ],
+  "requirements": [
+    "Proactive, process-oriented approach with close attention to detail.",
+    "Strong organizational, time-management, and interpersonal skills.",
+    "Strong verbal and written communication with internal and external stakeholders.",
+    "Ability to manage multiple tasks, resolve issues or escalate them, in a fast-paced environment.",
+    "Desire to grow into project management.",
+    "Willingness to work evenings and weekends when order cutovers require it."
+  ],
+  "niceToHave": [
+    "Familiarity with Microsoft Teams or Webex.",
+    "Prior coordination, project support, or administrative experience.",
+    "Fluency in French and English."
+  ],
+  "travel": "Remote contractor assignment supporting Bell service delivery in Canada. Evenings and weekends may be required for order cutovers. Work is staff augmentation for a Project Manager.",
+  "status": "published",
+  "internalNote": "Schema defaults used because the posting did not name a city, pay, or duration: serviceLine Project Management, industry wireless-carriers-oems, location Remote / Canada / CA, mode Remote, type Contract, pay omitted, duration omitted, postedDate 2026-10-06. Client named in the approved copy is Bell."
+}

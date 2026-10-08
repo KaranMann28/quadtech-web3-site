@@ -1,143 +1,81 @@
-# QuadTech Solutions Website
+# Quad Tech Solutions
 
-A modern, responsive website for QuadTech Solutions - a premier Telecom & IT company specializing in network infrastructure solutions.
+Website for Quad Tech Solutions Inc., a telecom and IT infrastructure engineering company founded in 2012. Offices in Baltimore, Maryland and Mississauga, Ontario. Field and engineering teams in California, the Greater Toronto Area, Montreal, and Calgary.
 
-## 🚀 Features
+This app includes the public marketing pages, an industries section, and a contractor careers board with résumé applications.
 
-- **Modern Design**: Glass morphism UI with smooth animations
-- **Responsive**: Mobile-first design that works on all devices
-- **AI Chatbot**: 24/7 AI Network Consultant powered by Google Gemini
-- **Performance**: Optimized for speed and SEO
-- **TypeScript**: Full type safety throughout the application
+## Run locally
 
-## 🤖 AI Network Consultant
-
-The website includes an intelligent AI chatbot that provides:
-- Technical consultation on network infrastructure
-- Lead qualification and generation
-- 24/7 customer support
-- Expert guidance on telecom solutions
-
-**⚠️ Important**: The AI chatbot requires a Google Gemini API key to function. See [DEPLOYMENT.md](./DEPLOYMENT.md) for setup instructions.
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 15 with Pages Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **AI**: Google Gemini 1.5 Flash
-- **Icons**: Lucide React
-- **Deployment**: Vercel
-
-## 📦 Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm, yarn, pnpm, or bun
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd quadtech-web3-site
-```
-
-2. Install dependencies:
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
-
-4. Add your Google Gemini API key to `.env.local`:
-```
-GEMINI_API_KEY=your_actual_api_key_here
-```
-
-5. Run the development server:
-```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) to view the website.
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000). Other commands:
 
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. Deploy to Vercel using the [Vercel Platform](https://vercel.com/new)
-2. Set up the `GEMINI_API_KEY` environment variable in Vercel dashboard
-3. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions
-
-### Other Platforms
-
-The application can be deployed to any platform that supports Next.js:
-- Netlify
-- AWS Amplify
-- Railway
-- Render
-
-Make sure to set the `GEMINI_API_KEY` environment variable on your chosen platform.
-
-## 📁 Project Structure
-
-```
-src/
-├── components/
-│   ├── ui/              # Reusable UI components
-│   ├── sections/        # Page sections
-│   └── layout/          # Layout components
-├── pages/
-│   ├── api/             # API routes
-│   └── *.tsx            # Page components
-├── styles/              # Global styles
-└── lib/                 # Utility functions
+```bash
+npm test
+npm run lint
+npm run build
 ```
 
-## 🔧 Available Scripts
+Copy `.env.example` to `.env`. Local SQLite is `DATABASE_URL="file:./data/portal.db"`. Production on Vercel uses Neon Postgres; a leftover `file:` URL is ignored when any `postgres://` URL is present.
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript compiler
+The chat widget on public pages calls Gemini through `/api/chat` when `GEMINI_API_KEY` is set. Without the key the widget still renders and replies with an offline message.
 
-## 🤝 Contributing
+Applications are stored in the database even when SMTP is not set. HR email is sent when `APPLY_SMTP_*` or `RESEND_API_KEY` is configured. Résumés go to `data/resumes/` locally, to the Application row on Vercel, or to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+```bash
+npx prisma migrate deploy
+npm run import-jobs
+```
 
-## 📄 License
+`import-jobs` loads `content/jobs/*.json` into the database. Run it once. A second run skips job IDs that already exist.
 
-This project is proprietary and confidential.
+Admin sign-in is documented in [docs/admin-auth-setup.md](docs/admin-auth-setup.md). `/admin` is not linked in the public nav.
 
-## 🆘 Support
+`APPLY_SMTP_HOST=json` writes the message through Nodemailer’s JSON transport instead of a real server. That mode is refused when `NODE_ENV` is `production` unless `AUTH_URL` is a loopback address.
 
-For deployment issues or questions about the AI chatbot setup, refer to:
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Detailed deployment guide
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Vercel Documentation](https://vercel.com/docs)
+If `ZAPIER_HOOK_URL` is set, a successful application is also POSTed as JSON. The résumé is base64 only when that encoding is 5 MB or smaller. A webhook failure is logged and does not fail the submission.
 
-## 📞 Contact
+## Post a job
 
-QuadTech Solutions
-- Website: [quadtechsolutions.com](https://quadtechsolutions.com)
-- Email: info@quadtechsolutions.com
-- Phone: +1 (555) 123-4567
+See [content/jobs/README.md](content/jobs/README.md). Roles with `draft: true` are validated at build time and are not shown, linked, or open for applications.
+
+## Routes
+
+| Path | Purpose |
+| --- | --- |
+| `/` `/about` `/services` `/why-us` `/contact` | Existing public pages |
+| `/industries` and `/industries/[slug]` | Six customer categories |
+| `/careers` | Job board. Filters sync to the query string. |
+| `/careers/[slug]` | Role detail and application |
+| `/careers/talent-network` | General application |
+| `/careers/thanks` | Confirmation after a successful submit |
+| `/admin` | Job posts and applications. Requires an allowlisted admin sign-in. |
+| `/portal` | Coming soon. Not linked in the nav. See [docs/portal-phase2.md](docs/portal-phase2.md). |
+| `/blog` and `/resources/*` | Kept so older links resolve. No material is published. |
+
+## Before launch
+
+Every item below is marked `TODO [CONFIRM]` in the source. Do not publish a role, a street address, a phone number, or a mailbox until the owner confirms it.
+
+- Street addresses for Baltimore, MD and Mississauga, ON
+- SMTP for the confirmed careers inbox `HR@quadtechsolutions.com` (`APPLY_TO_EMAIL` and `APPLY_SMTP_*`)
+- Hosted Postgres (`POSTGRES_URL`). Do not keep production admin on SQLite. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+- Admin list (`ADMIN_UPNS`)
+- Entra app registration ([docs/ADMIN-ENTRA.md](docs/ADMIN-ENTRA.md))
+- Résumé storage (local `data/resumes/` or private Vercel Blob)
+- Public contact inbox (`CONTACT_TO_EMAIL`)
+- SMTP or other mail provider (`APPLY_SMTP_*`)
+- Optional Zapier catch hook (`ZAPIER_HOOK_URL`) for Teams and SharePoint
+- Virus-scanning provider for résumés (type and size are checked today)
+- Phone numbers
+- Business hours and any response-time commitment
+- Social profile URLs
+- Newsletter, if one is wanted
+- Equipment rental catalog and rates
+- Case studies (no client names on public pages)
+- Whether `/blog` and `/resources/*` should remain
+- The two draft roles: pay, currency (USD or CAD), dates, duration, certification level, service line, and permission to set `draft` to `false`
+- Portal auth: Microsoft Entra ID or email magic link ([docs/portal-phase2.md](docs/portal-phase2.md))
