@@ -8,7 +8,11 @@ export default async function SignInPage({
   searchParams: Promise<{ check?: string; error?: string; provider?: string }>;
 }) {
   const session = await auth();
-  if (session?.user?.email && isAllowlistedUpn(session.user.email)) redirect("/admin");
+  const sessionEmail = session?.user?.email ?? "";
+  if (sessionEmail) {
+    // Signed in but not on ADMIN_UPNS: show access denied instead of the sign-in form.
+    redirect(isAllowlistedUpn(sessionEmail) ? "/admin" : "/admin/not-authorized");
+  }
   const query = await searchParams;
   const mode = authMode();
   const emailSent = query.check === "email" || query.provider === "nodemailer";

@@ -5,6 +5,18 @@ import { resolvePublicSlug } from "@/lib/jobs/store";
 
 const PUBLIC_ADMIN = new Set(["/admin/signin", "/admin/not-authorized"]);
 
+/**
+ * Auth.js names the session cookie `__Secure-authjs.session-token` whenever its
+ * base URL is https (AUTH_URL in production, the request URL on preview), and
+ * `authjs.session-token` on plain http. `getToken()` does not work this out on
+ * its own: it defaults to the http name, so on https it never finds the cookie.
+ * Mirror Auth.js here so the proxy and `auth()` read the same cookie.
+ */
+function wantsSecureCookie(request: NextRequest): boolean {
+  const base = process.env.AUTH_URL?.trim() || request.url;
+  return base.startsWith("https://");
+}
+
 function gone() {
   const html = `<!doctype html>
 <html lang="en">
@@ -55,7 +67,11 @@ export async function proxy(request: NextRequest) {
   if (!adminPage && !adminApi) return NextResponse.next();
   if (PUBLIC_ADMIN.has(pathname)) return NextResponse.next();
 
-  const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+    secureCookie: wantsSecureCookie(request),
+  });
   const email = typeof token?.email === "string" ? token.email : "";
   if (!email || !isAllowlistedUpn(email)) {
     if (adminApi) {
