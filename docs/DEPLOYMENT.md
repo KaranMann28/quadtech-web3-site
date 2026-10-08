@@ -28,10 +28,16 @@ Build: `prisma migrate deploy` on `prisma/postgres` plus `import-jobs` (idempote
 
 Local SQLite remains `DATABASE_URL="file:./data/portal.db"`. Do not point local `.env` at production Postgres.
 
-## Contact (Resend)
+## Contact (Microsoft 365 Graph, then Resend, then SMTP)
+
+The contact form sends through Microsoft Graph when `GRAPH_MAIL_*` is set, otherwise Resend, otherwise `APPLY_SMTP_*`. Careers applications are unchanged (Resend or SMTP). Setup: [graph-mail-setup.md](graph-mail-setup.md).
 
 | Name | Purpose |
 | --- | --- |
+| `GRAPH_MAIL_TENANT_ID` | Optional. Defaults to `AUTH_MICROSOFT_ENTRA_ID_TENANT_ID` |
+| `GRAPH_MAIL_CLIENT_ID` | Application (client) ID of the "QuadTech Website Mailer" Entra app |
+| `GRAPH_MAIL_CLIENT_SECRET` | Client secret of that app (sensitive) |
+| `GRAPH_MAIL_SENDER` | Mailbox the app sends as: `info@quadtechsolutions.com` (the only mailbox in its Exchange RBAC scope) |
 | `RESEND_API_KEY` | Send contact form mail via Resend; also used for application mail when SMTP is unset |
 | `RESEND_FROM` | Optional verified sender. Default is Resend’s onboarding address until the domain is verified |
 | `CONTACT_EMAIL` or `CONTACT_TO_EMAIL` | Inbox that receives the contact message. Careers applications use `APPLY_TO_EMAIL=HR@quadtechsolutions.com` |

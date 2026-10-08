@@ -2,6 +2,7 @@ import { z } from "zod";
 import { DeliveryError, isEmailConfigured, jsonMailAllowed } from "@/lib/apply/deliver";
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
+import { graphMailConfig, sendGraphMail } from "@/lib/mail/graph";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Enter your name.").max(120),
@@ -56,8 +57,24 @@ async function sendContactEmail(input: {
   subject: string;
   text: string;
   replyTo: string;
+  replyToName?: string;
   html: string;
 }): Promise<void> {
+  // Order: Microsoft Graph (M365) if configured, then Resend, then SMTP.
+  const graph = graphMailConfig();
+  if (graph) {
+    await sendGraphMail(
+      {
+        to: process.env.CONTACT_TO_EMAIL?.trim() || process.env.CONTACT_EMAIL?.trim() || graph.sender,
+        subject: input.subject,
+        text: input.text,
+        html: input.html,
+        replyTo: { address: input.replyTo, name: input.replyToName },
+      },
+      { config: graph },
+    );
+    return;
+  }
   if (process.env.RESEND_API_KEY?.trim()) {
     await sendViaResend(input);
     return;
@@ -128,6 +145,7 @@ export async function handleContact(form: FormData): Promise<ContactResult> {
       subject: `Website inquiry — ${parsed.data.name}`,
       text: body,
       replyTo: parsed.data.email,
+      replyToName: parsed.data.name,
       html,
     });
   } catch (error) {
@@ -135,10 +153,10 @@ export async function handleContact(form: FormData): Promise<ContactResult> {
       return {
         ok: false,
         status: 503,
-        message:
-          "This inbox is not configured, so the message was not sent. TODO [CONFIRM] a contact address before launch.",
+        message: "This inbox is not configured, so the message was not sent.",
       };
     }
+    console.error("Contact email failed:", error instanceof Error ? error.message : "unknown error");
     return { ok: false, status: 502, message: "The message could not be sent. Try again shortly." };
   }
   return { ok: true };
