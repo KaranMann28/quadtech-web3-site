@@ -49,6 +49,16 @@ export function JobArticle({
           <p className="font-mono text-sm text-muted-foreground">{job.jobId}</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{job.title}</h1>
           <p className="mt-4 text-muted-foreground">{job.summary}</p>
+          {mode === "live" ? (
+            <p className="mt-6 lg:hidden">
+              <a
+                href="#apply"
+                className="inline-flex h-11 items-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
+              >
+                Apply for this job
+              </a>
+            </p>
+          ) : null}
           <dl className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-muted-foreground">Location</dt>

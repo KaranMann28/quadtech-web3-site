@@ -2,21 +2,16 @@ import { postWebhook, resumeForWebhook, sendApplicationEmail, DeliveryError } fr
 import { validateResume } from "@/lib/apply/files";
 import {
   applicationSchema,
+  fullNameOf,
   issuesToFieldErrors,
-  validateScreeners,
+  WORK_AUTH_NO,
+  WORK_AUTH_YES,
   type FieldErrors,
 } from "@/lib/apply/schema";
 import { recordApplication } from "@/lib/applications/store";
 import { getPublishedJob } from "@/lib/jobs/store";
-import { screenersForKey, screenersForService, type Screener } from "@/lib/jobs/screeners";
 import type { PublicJob } from "@/lib/jobs/schema";
-import {
-  countryName,
-  serviceLineFromSlug,
-  WORK_AUTH_LABELS,
-  type ServiceSlug,
-  type WorkAuth,
-} from "@/lib/taxonomy";
+import { countryName } from "@/lib/taxonomy";
 
 export type ApplyResult =
   | { ok: true }
@@ -27,14 +22,6 @@ function text(form: FormData, key: string): string {
   return typeof value === "string" ? value : "";
 }
 
-function screenerAnswers(form: FormData, screeners: Screener[]): Record<string, string> {
-  const answers: Record<string, string> = {};
-  for (const screener of screeners) {
-    answers[screener.id] = text(form, `screener__${screener.id}`);
-  }
-  return answers;
-}
-
 async function readResume(form: FormData) {
   const value = form.get("resume");
   if (!(value instanceof File)) return null;
@@ -43,57 +30,38 @@ async function readResume(form: FormData) {
 }
 
 function buildEmail(input: {
-  fields: {
-    fullName: string;
-    email: string;
-    phone: string;
-    cityRegion: string;
-    country: "US" | "CA";
-    workAuthorization: WorkAuth;
-    linkedin: string;
-    referral: string;
-    message: string;
-  };
-  screeners: Screener[];
-  answers: Record<string, string>;
+  fullName: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  workAuthorization: "" | typeof WORK_AUTH_YES | typeof WORK_AUTH_NO;
   job?: PublicJob;
-  serviceLabel: string;
 }) {
-  const { fields, job } = input;
+  const { job } = input;
   const lines = [
-    job
-      ? `Role: ${job.title}`
-      : "Role: Talent network (no specific posting)",
+    job ? `Role: ${job.title}` : "Role: Talent network (no specific posting)",
     job ? `Job ID: ${job.jobId}` : null,
-    job ? `Service line: ${job.serviceLine}` : `Service line: ${input.serviceLabel}`,
-    job ? `Industry: ${job.industry}` : null,
+    job ? `Service line: ${job.serviceLine}` : null,
     "",
-    `Name: ${fields.fullName}`,
-    `Email: ${fields.email}`,
-    `Phone: ${fields.phone}`,
-    `City / region: ${fields.cityRegion}`,
-    `Country: ${countryName(fields.country)}`,
-    `Work authorization (${countryName(fields.country)}): ${WORK_AUTH_LABELS[fields.workAuthorization]}`,
-    `LinkedIn: ${fields.linkedin || "(not provided)"}`,
-    `How they heard: ${fields.referral || "(not provided)"}`,
+    `Name: ${input.fullName}`,
+    `Email: ${input.email}`,
+    `Phone: ${input.phone || "(not provided)"}`,
+    `LinkedIn: ${input.linkedin || "(not provided)"}`,
+    job && input.workAuthorization
+      ? `Authorized to work in ${countryName(job.location.country)}: ${
+          input.workAuthorization === WORK_AUTH_YES ? "Yes" : "No"
+        }`
+      : null,
     "",
-    "Screening answers:",
-    ...input.screeners.map(
-      (screener) => `- ${screener.label}: ${input.answers[screener.id]?.trim() || "(blank)"}`,
-    ),
-    "",
-    "Message:",
-    fields.message || "(none)",
-    "",
-    "Consent: applicant agreed the information is used for recruiting only.",
+    "Submitted from the careers site. The form states that by submitting, the applicant agrees Quad Tech Solutions Inc. may store the information for recruiting.",
     `Submitted: ${new Date().toISOString()}`,
   ].filter((line): line is string => line !== null);
 
   const subject = job
-    ? `Application ${job.jobId} — ${job.title} — ${fields.fullName}`
-    : `Talent network application — ${fields.fullName}`;
+    ? `Application ${job.jobId} — ${job.title} — ${input.fullName}`
+    : `Talent network application — ${input.fullName}`;
 
-  return { subject, text: lines.join("\n"), applicantName: fields.fullName, applicantEmail: fields.email };
+  return { subject, text: lines.join("\n"), applicantName: input.fullName, applicantEmail: input.email };
 }
 
 export async function handleApplication(form: FormData): Promise<ApplyResult> {
@@ -103,8 +71,6 @@ export async function handleApplication(form: FormData): Promise<ApplyResult> {
 
   const kind = text(form, "kind");
   let job: PublicJob | undefined;
-  let screeners: Screener[] = [];
-  let serviceLabel = "";
 
   if (kind === "job") {
     job = await getPublishedJob(text(form, "jobSlug"));
@@ -115,54 +81,34 @@ export async function handleApplication(form: FormData): Promise<ApplyResult> {
         message: "This role is not open for applications.",
       };
     }
-    screeners = screenersForService(job.serviceLine);
-    serviceLabel = job.serviceLine;
-  } else if (kind === "talent-network") {
-    const selected = text(form, "serviceLine");
-    if (selected === "general") {
-      screeners = screenersForKey("general");
-      serviceLabel = "Multiple service lines / not sure yet";
-    } else {
-      const line = serviceLineFromSlug(selected);
-      if (!line) {
-        return {
-          ok: false,
-          status: 400,
-          message: "Select a service line.",
-          fieldErrors: { serviceLine: "Select a service line." },
-        };
-      }
-      screeners = screenersForKey(selected as ServiceSlug);
-      serviceLabel = line;
-    }
-  } else {
+  } else if (kind !== "talent-network") {
     return { ok: false, status: 400, message: "Unknown application type." };
   }
 
   const parsed = applicationSchema.safeParse({
-    fullName: text(form, "fullName"),
+    firstName: text(form, "firstName"),
+    lastName: text(form, "lastName"),
     email: text(form, "email"),
     phone: text(form, "phone"),
-    cityRegion: text(form, "cityRegion"),
-    country: text(form, "country"),
-    workAuthorization: text(form, "workAuthorization"),
     linkedin: text(form, "linkedin"),
-    referral: text(form, "referral"),
-    message: text(form, "message"),
-    consent: text(form, "consent") === "true",
   });
 
-  const answers = screenerAnswers(form, screeners);
-  const screenerErrors = validateScreeners(screeners, answers);
-  const fieldErrors: FieldErrors = {
-    ...(parsed.success ? {} : issuesToFieldErrors(parsed.error)),
-    ...screenerErrors,
-  };
+  const fieldErrors: FieldErrors = parsed.success ? {} : issuesToFieldErrors(parsed.error);
+
+  // The yes/no work-authorization question is asked on posted roles only,
+  // for the posting's country. The talent network has no country context.
+  let workAuthorization: "" | typeof WORK_AUTH_YES | typeof WORK_AUTH_NO = "";
+  if (job) {
+    const answer = text(form, "workAuthorization");
+    if (answer === "yes") workAuthorization = WORK_AUTH_YES;
+    else if (answer === "no") workAuthorization = WORK_AUTH_NO;
+    else fieldErrors.workAuthorization = "Select yes or no.";
+  }
 
   const resumeResult = validateResume(await readResume(form));
   if (!resumeResult.ok) fieldErrors.resume = resumeResult.message;
 
-  if (!parsed.success || Object.keys(fieldErrors).length > 0) {
+  if (!parsed.success || !resumeResult.ok || Object.keys(fieldErrors).length > 0) {
     return {
       ok: false,
       status: 400,
@@ -171,35 +117,28 @@ export async function handleApplication(form: FormData): Promise<ApplyResult> {
     };
   }
 
+  const fullName = fullNameOf(parsed.data);
   const mail = buildEmail({
-    fields: parsed.data,
-    screeners,
-    answers,
+    fullName,
+    email: parsed.data.email,
+    phone: parsed.data.phone,
+    linkedin: parsed.data.linkedin,
+    workAuthorization,
     job,
-    serviceLabel,
   });
-
-  if (!resumeResult.ok) {
-    return {
-      ok: false,
-      status: 400,
-      message: "Check the highlighted fields.",
-      fieldErrors,
-    };
-  }
 
   const resume = resumeResult.resume;
   try {
     await recordApplication({
       jobId: job?.jobId ?? null,
       kind: kind === "job" ? "job" : "talent-network",
-      fields: parsed.data,
-      serviceLine: serviceLabel,
-      screeners: screeners.map((screener) => ({
-        id: screener.id,
-        label: screener.label,
-        answer: answers[screener.id]?.trim() ?? "",
-      })),
+      fullName,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      linkedin: parsed.data.linkedin,
+      country: job?.location.country ?? "",
+      workAuthorization,
+      serviceLine: job?.serviceLine ?? "General",
       resume,
     });
   } catch (error) {
@@ -232,23 +171,19 @@ export async function handleApplication(form: FormData): Promise<ApplyResult> {
     job: job
       ? { slug: job.slug, jobId: job.jobId, title: job.title, serviceLine: job.serviceLine }
       : null,
-    serviceLine: serviceLabel,
+    serviceLine: job?.serviceLine ?? "General",
     applicant: {
-      fullName: parsed.data.fullName,
+      fullName,
       email: parsed.data.email,
       phone: parsed.data.phone,
-      cityRegion: parsed.data.cityRegion,
-      country: parsed.data.country,
-      workAuthorization: parsed.data.workAuthorization,
+      cityRegion: "",
+      country: job?.location.country ?? "",
+      workAuthorization,
       linkedin: parsed.data.linkedin,
-      referral: parsed.data.referral,
-      message: parsed.data.message,
+      referral: "",
+      message: "",
     },
-    screeners: screeners.map((screener) => ({
-      id: screener.id,
-      label: screener.label,
-      answer: answers[screener.id]?.trim() ?? "",
-    })),
+    screeners: [],
     resume: {
       filename: resume.filename,
       contentType: resume.contentType,

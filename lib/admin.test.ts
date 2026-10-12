@@ -115,21 +115,12 @@ test("applications persist when SMTP is not configured", async () => {
   const { listApplications } = await import("@/lib/applications/store");
   const form = new FormData();
   form.set("kind", "talent-network");
-  form.set("serviceLine", "general");
-  form.set("fullName", "Persist Check");
+  form.set("firstName", "Persist");
+  form.set("lastName", "Check");
   form.set("email", "persist.check@example.com");
   form.set("phone", "+1 416 555 0100");
-  form.set("cityRegion", "Mississauga, ON");
-  form.set("country", "CA");
-  form.set("workAuthorization", "citizen-pr");
   form.set("linkedin", "");
-  form.set("referral", "");
-  form.set("message", "");
-  form.set("consent", "true");
   form.set("company_website", "");
-  form.set("screener__general_years", "6");
-  form.set("screener__general_tools", "XCAL");
-  form.set("screener__travel_radius", "GTA");
   form.set(
     "resume",
     new File([Buffer.from("%PDF-1.4\npersist\n")], "persist.pdf", { type: "application/pdf" }),

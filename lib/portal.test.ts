@@ -7,7 +7,7 @@ import { handleApplication } from "@/lib/apply/process";
 import { validateResume } from "@/lib/apply/files";
 import { rateLimit, resetRateLimits } from "@/lib/apply/rate-limit";
 import { jsonMailAllowed, sendApplicationEmail } from "@/lib/apply/deliver";
-import { filterJobs, filtersToQuery, parseJobFilters } from "@/lib/jobs/filter";
+import { groupJobsByServiceLine, searchJobs } from "@/lib/jobs/search";
 import { jobsDir, loadJobsFromDir, loadSeedJobs } from "@/lib/jobs/load";
 import type { PublicJob } from "@/lib/jobs/schema";
 import { jobPostingJsonLd } from "@/lib/jobs/jsonld";
@@ -36,18 +36,14 @@ function pdfFile(name = "resume.pdf"): File {
 function baseForm(kind: "job" | "talent-network"): FormData {
   const form = new FormData();
   form.set("kind", kind);
-  form.set("fullName", "Amina Rahman");
+  form.set("firstName", "Amina");
+  form.set("lastName", "Rahman");
   form.set("email", "amina@example.com");
   form.set("phone", "+1 416 200 0199");
-  form.set("cityRegion", "Mississauga, ON");
-  form.set("country", "CA");
-  form.set("workAuthorization", "citizen-pr");
   form.set("linkedin", "");
-  form.set("referral", "");
-  form.set("message", "");
-  form.set("consent", "true");
   form.set("company_website", "");
   form.set("resume", pdfFile());
+  if (kind === "job") form.set("workAuthorization", "yes");
   return form;
 }
 
@@ -103,7 +99,7 @@ test("loader rejects a public role that still has TODO [CONFIRM]", () => {
   assert.throws(() => loadJobsFromDir(dir), /TODO \[CONFIRM\]/);
 });
 
-test("filters match service, country, keyword, and dual-country remote roles", () => {
+test("board search matches title and location, and groups follow the taxonomy order", () => {
   const jobs: PublicJob[] = [
     sample(),
     sample({
@@ -117,29 +113,34 @@ test("filters match service, country, keyword, and dual-country remote roles", (
       postedDate: "2026-05-01",
       summary: "Remote iBwave and ATOLL design support.",
     }),
+    sample({
+      slug: "newer-field-role",
+      jobId: "QT-JOB-2026-012",
+      title: "Newer Field Role",
+      postedDate: "2026-06-01",
+      summary: "Newer drive testing assignment in the GTA.",
+    }),
   ];
-  const caDrive = filterJobs(jobs, {
-    ...parseJobFilters({ service: "drive-walk-testing", country: "CA" }),
-    q: "",
-    industry: "",
-    mode: "",
-    type: "",
-  });
-  assert.deepEqual(caDrive.map((job) => job.slug), ["sample-role"]);
 
-  const canada = filterJobs(jobs, parseJobFilters(new URLSearchParams("country=CA")));
-  assert.deepEqual(canada.map((job) => job.slug).sort(), ["remote-design", "sample-role"]);
+  assert.deepEqual(searchJobs(jobs, "ibwave").map((job) => job.slug), ["remote-design"]);
+  assert.deepEqual(
+    searchJobs(jobs, "mississauga").map((job) => job.slug).sort(),
+    ["newer-field-role", "sample-role"],
+  );
+  assert.equal(searchJobs(jobs, "  ").length, 3, "blank query returns everything");
+  assert.equal(searchJobs(jobs, "no-match-here").length, 0);
 
-  const remoteCa = filterJobs(jobs, parseJobFilters(new URLSearchParams("country=CA&mode=remote")));
-  assert.deepEqual(remoteCa.map((job) => job.slug), ["remote-design"]);
-
-  const keyword = filterJobs(jobs, parseJobFilters(new URLSearchParams("q=ibwave")));
-  assert.deepEqual(keyword.map((job) => job.slug), ["remote-design"]);
-
-  const roundTrip = parseJobFilters(new URLSearchParams(filtersToQuery(parseJobFilters(new URLSearchParams("service=drive-walk-testing&country=CA"))).slice(1)));
-  assert.equal(roundTrip.service, "drive-walk-testing");
-  assert.equal(roundTrip.country, "CA");
-  assert.equal(parseJobFilters(new URLSearchParams("service=not-a-line")).service, "");
+  const groups = groupJobsByServiceLine(jobs);
+  assert.deepEqual(
+    groups.map((group) => group.serviceLine),
+    ["RF Engineering", "Drive & Walk Testing"],
+    "groups follow SERVICE_LINES order",
+  );
+  assert.deepEqual(
+    groups[1]?.jobs.map((job) => job.slug),
+    ["newer-field-role", "sample-role"],
+    "newest postings first inside a group",
+  );
 });
 
 test("résumé checks accept PDF and reject oversize or mismatched files", () => {
@@ -181,19 +182,52 @@ test("draft roles and invalid applications are rejected", async () => {
   if (!draftResult.ok) assert.equal(draftResult.status, 404);
 
   const missing = baseForm("talent-network");
-  missing.set("serviceLine", "general");
-  missing.set("screener__general_years", "6");
-  missing.set("screener__general_tools", "XCAL");
-  missing.set("screener__travel_radius", "GTA");
-  missing.set("fullName", "");
+  missing.set("firstName", "");
   const invalid = await handleApplication(missing);
   assert.equal(invalid.ok, false);
-  if (!invalid.ok) assert.equal(invalid.fieldErrors?.fullName !== undefined, true);
+  if (!invalid.ok) assert.equal(invalid.fieldErrors?.firstName !== undefined, true);
+
+  const badPhone = baseForm("talent-network");
+  badPhone.set("phone", "call me");
+  const phoneResult = await handleApplication(badPhone);
+  assert.equal(phoneResult.ok, false);
+  if (!phoneResult.ok) assert.equal(phoneResult.fieldErrors?.phone !== undefined, true);
 
   const honeypot = baseForm("talent-network");
   honeypot.set("company_website", "https://spam.example");
   const ignored = await handleApplication(honeypot);
   assert.deepEqual(ignored, { ok: true });
+});
+
+test("a posted role requires the yes/no work authorization answer; talent network does not", async () => {
+  process.env.APPLY_SMTP_HOST = "json";
+  process.env.APPLY_SMTP_FROM = "careers-test@example.com";
+  process.env.APPLY_TO_EMAIL = "careers@example.com";
+  (process.env as { NODE_ENV?: string }).NODE_ENV = "test";
+
+  const withoutAnswer = baseForm("job");
+  withoutAnswer.set("jobSlug", "senior-salesforce-functional-lead");
+  withoutAnswer.delete("workAuthorization");
+  const rejected = await handleApplication(withoutAnswer);
+  assert.equal(rejected.ok, false);
+  if (!rejected.ok) {
+    assert.equal(rejected.status, 400);
+    assert.equal(rejected.fieldErrors?.workAuthorization, "Select yes or no.");
+  }
+
+  const applied = baseForm("job");
+  applied.set("jobSlug", "senior-salesforce-functional-lead");
+  applied.set("phone", "");
+  applied.set("workAuthorization", "no");
+  assert.deepEqual(await handleApplication(applied), { ok: true }, "a 'no' answer is still recorded");
+
+  const network = baseForm("talent-network");
+  network.set("phone", "");
+  assert.deepEqual(await handleApplication(network), { ok: true }, "no work-auth question off a posting");
+
+  delete process.env.APPLY_SMTP_HOST;
+  delete process.env.APPLY_SMTP_FROM;
+  delete process.env.APPLY_TO_EMAIL;
 });
 
 test("email sends and a failed webhook does not fail the application", async () => {
@@ -211,10 +245,6 @@ test("email sends and a failed webhook does not fail the application", async () 
   delete process.env.ZAPIER_HOOK_URL;
 
   const form = baseForm("talent-network");
-  form.set("serviceLine", "drive-walk-testing");
-  form.set("screener__xcal_years", "4");
-  form.set("screener__own_equipment", "XCAL laptop");
-  form.set("screener__travel_radius", "100 km");
 
   const sent = await sendApplicationEmail(
     {

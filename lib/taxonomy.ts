@@ -71,6 +71,23 @@ export const WORK_AUTH_LABELS: Record<WorkAuth, string> = {
   "needs-sponsorship": "Needs sponsorship",
 };
 
+/**
+ * Label for a stored work-authorization value. The simplified apply form
+ * stores "authorized" / "not-authorized" against the posting's country;
+ * rows recorded before 2026-10 hold the legacy three-option values; talent
+ * network applications hold "".
+ */
+export function workAuthLabel(value: string, country: string): string {
+  if (value === "authorized" || value === "not-authorized") {
+    const name = country === "US" || country === "CA" ? countryName(country) : "the posting country";
+    return value === "authorized" ? `Authorized to work in ${name}` : `Not authorized to work in ${name}`;
+  }
+  if ((WORK_AUTH as readonly string[]).includes(value)) {
+    return WORK_AUTH_LABELS[value as WorkAuth];
+  }
+  return value || "—";
+}
+
 const serviceSlugToLine = Object.fromEntries(
   Object.entries(SERVICE_SLUGS).map(([line, slug]) => [slug, line]),
 ) as Record<ServiceSlug, ServiceLine>;

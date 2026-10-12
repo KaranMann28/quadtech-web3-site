@@ -2,76 +2,60 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { NativeSelect } from "@/components/native-select";
+import { FileText, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   applicationSchema,
   issuesToFieldErrors,
-  validateScreeners,
   type FieldErrors,
 } from "@/lib/apply/schema";
-import { screenersForKey, type Screener } from "@/lib/jobs/screeners";
 import type { PublicJob } from "@/lib/jobs/schema";
-import {
-  SERVICE_LINES,
-  WORK_AUTH,
-  WORK_AUTH_LABELS,
-  countryName,
-  serviceSlug,
-  type CountryCode,
-  type ServiceSlug,
-} from "@/lib/taxonomy";
+import { countryName } from "@/lib/taxonomy";
 
 type Props =
   | { kind: "job"; job: PublicJob }
   | { kind: "talent-network" };
 
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
+const RESUME_ACCEPT =
+  ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+function resumeProblem(file: File | null): string | null {
+  if (!file || file.size === 0) return "Attach a résumé.";
+  if (file.size > MAX_RESUME_BYTES) return "Résumé must be 5 MB or smaller.";
+  if (!/\.(pdf|doc|docx)$/i.test(file.name)) return "Résumé must be a PDF, DOC, or DOCX file.";
+  return null;
+}
 
 function Field({
   id,
   label,
-  required,
+  optional,
   error,
-  hint,
   children,
 }: {
   id: string;
   label: string;
-  required?: boolean;
+  optional?: boolean;
   error?: string;
-  hint?: string;
   children: React.ReactNode;
 }) {
-  const hintId = hint ? `${id}-hint` : undefined;
-  const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-1.5">
       <Label htmlFor={id}>
         {label}
-        {required ? (
-          <>
-            <span aria-hidden="true" className="text-accent">
-              {" "}
-              *
-            </span>
-            <span className="sr-only"> (required)</span>
-          </>
-        ) : null}
+        {optional ? <span className="text-muted-foreground"> (optional)</span> : null}
       </Label>
-      <div data-describedby={describedBy}>{children}</div>
-      {hint ? (
-        <p id={hintId} className="text-sm text-muted-foreground">
-          {hint}
-        </p>
-      ) : null}
+      {children}
       {error ? (
-        <p id={errorId} className="text-sm text-destructive" role="alert">
+        <p id={`${id}-error`} className="text-sm text-destructive" role="alert">
           {error}
         </p>
       ) : null}
@@ -83,64 +67,61 @@ export function ApplyForm(props: Props) {
   const router = useRouter();
   const formId = useId();
   const summaryRef = useRef<HTMLDivElement>(null);
-  const [serviceKey, setServiceKey] = useState<ServiceSlug | "general">(
-    props.kind === "job" ? serviceSlug(props.job.serviceLine) : "general",
-  );
-  const [country, setCountry] = useState<CountryCode>("US");
-  const [consent, setConsent] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [pending, setPending] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
-
-  const screeners: Screener[] =
-    props.kind === "job" ? screenersForKey(serviceSlug(props.job.serviceLine)) : screenersForKey(serviceKey);
 
   useEffect(() => {
     if (formError) summaryRef.current?.focus();
   }, [formError]);
 
   const title = props.kind === "job" ? props.job.title : "Talent network";
+  const authCountry = props.kind === "job" ? countryName(props.job.location.country) : null;
 
-  function described(id: string) {
-    return [errors[id] ? `${id}-error` : null, `${id}-hint`].filter(Boolean).join(" ") || undefined;
+  function pickResume(file: File | null) {
+    setResumeFile(file);
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.resume;
+      return next;
+    });
+  }
+
+  function onDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files?.[0] ?? null;
+    if (file && fileInputRef.current) {
+      // Keep the real input in sync so FormData picks the dropped file up.
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      fileInputRef.current.files = transfer.files;
+    }
+    pickResume(file);
   }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    data.set("consent", consent ? "true" : "false");
-    const answers: Record<string, string> = {};
-    for (const screener of screeners) {
-      answers[screener.id] = String(data.get(`screener__${screener.id}`) ?? "");
-    }
     const parsed = applicationSchema.safeParse({
-      fullName: String(data.get("fullName") ?? ""),
+      firstName: String(data.get("firstName") ?? ""),
+      lastName: String(data.get("lastName") ?? ""),
       email: String(data.get("email") ?? ""),
       phone: String(data.get("phone") ?? ""),
-      cityRegion: String(data.get("cityRegion") ?? ""),
-      country: String(data.get("country") ?? ""),
-      workAuthorization: String(data.get("workAuthorization") ?? ""),
       linkedin: String(data.get("linkedin") ?? ""),
-      referral: String(data.get("referral") ?? ""),
-      message: String(data.get("message") ?? ""),
-      consent: consent === true,
     });
-    const nextErrors: FieldErrors = {
-      ...(parsed.success ? {} : issuesToFieldErrors(parsed.error)),
-      ...validateScreeners(screeners, answers),
-    };
-    if (props.kind === "talent-network" && !serviceKey) {
-      nextErrors.serviceLine = "Select a service line.";
+    const nextErrors: FieldErrors = parsed.success ? {} : issuesToFieldErrors(parsed.error);
+    if (props.kind === "job") {
+      const auth = String(data.get("workAuthorization") ?? "");
+      if (auth !== "yes" && auth !== "no") nextErrors.workAuthorization = "Select yes or no.";
     }
-    const file = data.get("resume");
-    if (!(file instanceof File) || file.size === 0) {
-      nextErrors.resume = "Attach a résumé.";
-    } else if (file.size > MAX_RESUME_BYTES) {
-      nextErrors.resume = "Résumé must be 5 MB or smaller.";
-    } else if (!/\.(pdf|doc|docx)$/i.test(file.name)) {
-      nextErrors.resume = "Résumé must be a PDF, DOC, or DOCX file.";
-    }
+    const resumeError = resumeProblem(resumeFile);
+    if (resumeError) nextErrors.resume = resumeError;
+
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       setFormError("Check the highlighted fields.");
@@ -177,12 +158,18 @@ export function ApplyForm(props: Props) {
   }
 
   return (
-    <form id="apply" className="grid gap-5 rounded-xl border border-border bg-card p-5" onSubmit={onSubmit} noValidate>
+    <form
+      id="apply"
+      className="grid gap-4 rounded-xl border border-border bg-card p-5"
+      onSubmit={onSubmit}
+      noValidate
+    >
       <div>
-        <h2 className="text-xl font-semibold">Apply</h2>
+        <h2 className="text-xl font-semibold">{props.kind === "job" ? "Apply for this job" : "Apply"}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {props.kind === "job" ? props.job.title : "General application for future assignments."}{" "}
-          Pay on a posting, when listed, is USD or CAD. Work authorization is for the country you select.
+          {props.kind === "job"
+            ? "Takes under a minute. Name, email, and résumé are all that is required."
+            : "A general application for future assignments. Name, email, and résumé are all that is required."}
         </p>
       </div>
       {formError ? (
@@ -196,11 +183,7 @@ export function ApplyForm(props: Props) {
           {Object.keys(errors).length > 0 ? (
             <ul className="mt-2 list-disc pl-5">
               {Object.entries(errors).map(([key, message]) => (
-                <li key={key}>
-                  <a href={`#${key}`} className="underline">
-                    {message}
-                  </a>
-                </li>
+                <li key={key}>{message}</li>
               ))}
             </ul>
           ) : null}
@@ -213,152 +196,176 @@ export function ApplyForm(props: Props) {
       </div>
       <input type="hidden" name="kind" value={props.kind} />
       {props.kind === "job" ? <input type="hidden" name="jobSlug" value={props.job.slug} /> : null}
-      <input type="hidden" name="consent" value={consent ? "true" : "false"} />
 
-      <Field id="fullName" label="Full name" required error={errors.fullName}>
-        <Input id="fullName" name="fullName" autoComplete="name" required aria-invalid={Boolean(errors.fullName)} aria-describedby={errors.fullName ? "fullName-error" : undefined} className="h-11" />
-      </Field>
-      <Field id="email" label="Email" required error={errors.email}>
-        <Input id="email" name="email" type="email" autoComplete="email" required aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "email-error" : undefined} className="h-11" />
-      </Field>
-      <Field id="phone" label="Phone" required error={errors.phone}>
-        <Input id="phone" name="phone" type="tel" autoComplete="tel" required aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "phone-error" : undefined} className="h-11" />
-      </Field>
-      <Field id="cityRegion" label="City and region" required error={errors.cityRegion}>
-        <Input id="cityRegion" name="cityRegion" autoComplete="address-level2" required aria-invalid={Boolean(errors.cityRegion)} aria-describedby={errors.cityRegion ? "cityRegion-error" : undefined} className="h-11" />
-      </Field>
-      <Field id="country" label="Country" required error={errors.country}>
-        <NativeSelect
-          id="country"
-          name="country"
-          value={country}
-          required
-          aria-invalid={Boolean(errors.country)}
-          onChange={(event) => setCountry(event.target.value as CountryCode)}
-        >
-          <option value="US">United States</option>
-          <option value="CA">Canada</option>
-        </NativeSelect>
-      </Field>
-      <Field
-        id="workAuthorization"
-        label={`Work authorization for ${countryName(country)}`}
-        required
-        error={errors.workAuthorization}
-      >
-        <NativeSelect id="workAuthorization" name="workAuthorization" required defaultValue="" aria-invalid={Boolean(errors.workAuthorization)}>
-          <option value="" disabled>
-            Select one
-          </option>
-          {WORK_AUTH.map((value) => (
-            <option key={value} value={value}>
-              {WORK_AUTH_LABELS[value]}
-            </option>
-          ))}
-        </NativeSelect>
-      </Field>
-      {props.kind === "talent-network" ? (
-        <Field id="serviceLine" label="Service line" required error={errors.serviceLine} hint="Pick the closest line. Screening questions follow it.">
-          <NativeSelect
-            id="serviceLine"
-            name="serviceLine"
-            value={serviceKey}
-            aria-invalid={Boolean(errors.serviceLine)}
-            aria-describedby={described("serviceLine")}
-            onChange={(event) => setServiceKey(event.target.value as ServiceSlug | "general")}
-          >
-            <option value="general">Multiple lines / not sure yet</option>
-            {SERVICE_LINES.map((line) => (
-              <option key={line} value={serviceSlug(line)}>
-                {line}
-              </option>
-            ))}
-          </NativeSelect>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field id="firstName" label="First name" error={errors.firstName}>
+          <Input
+            id="firstName"
+            name="firstName"
+            autoComplete="given-name"
+            required
+            aria-invalid={Boolean(errors.firstName)}
+            aria-describedby={errors.firstName ? "firstName-error" : undefined}
+            className="h-11"
+          />
         </Field>
-      ) : null}
-
-      <fieldset className="grid gap-4 border-t border-border pt-4">
-        <legend className="text-sm font-semibold">Role questions</legend>
-        {screeners.map((screener) => {
-          const id = `screener__${screener.id}`;
-          return (
-            <Field key={id} id={id} label={screener.label} required={screener.required} error={errors[id]}>
-              {screener.type === "textarea" ? (
-                <Textarea id={id} name={id} rows={3} aria-invalid={Boolean(errors[id])} aria-describedby={errors[id] ? `${id}-error` : undefined} />
-              ) : (
-                <Input
-                  id={id}
-                  name={id}
-                  type={screener.type === "number" ? "number" : "text"}
-                  inputMode={screener.type === "number" ? "decimal" : undefined}
-                  min={screener.type === "number" ? 0 : undefined}
-                  max={screener.type === "number" ? 60 : undefined}
-                  step={screener.type === "number" ? "0.5" : undefined}
-                  className="h-11"
-                  aria-invalid={Boolean(errors[id])}
-                  aria-describedby={errors[id] ? `${id}-error` : undefined}
-                />
-              )}
-            </Field>
-          );
-        })}
-      </fieldset>
-
-      <Field
-        id="resume"
-        label="Résumé"
-        required
-        error={errors.resume}
-        hint="PDF, DOC, or DOCX. 5 MB maximum."
-      >
-        {/* TODO [CONFIRM] virus-scanning provider. Type and size are checked; a malware scanner is not connected. */}
+        <Field id="lastName" label="Last name" error={errors.lastName}>
+          <Input
+            id="lastName"
+            name="lastName"
+            autoComplete="family-name"
+            required
+            aria-invalid={Boolean(errors.lastName)}
+            aria-describedby={errors.lastName ? "lastName-error" : undefined}
+            className="h-11"
+          />
+        </Field>
+      </div>
+      <Field id="email" label="Email" error={errors.email}>
         <Input
-          id="resume"
-          name="resume"
-          type="file"
-          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
           required
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "email-error" : undefined}
           className="h-11"
-          aria-invalid={Boolean(errors.resume)}
-          aria-describedby={errors.resume ? "resume-error resume-hint" : "resume-hint"}
         />
       </Field>
-      <Field id="linkedin" label="LinkedIn" error={errors.linkedin} hint="Optional. Use a full https://linkedin.com profile URL.">
-        <Input id="linkedin" name="linkedin" type="url" autoComplete="url" className="h-11" aria-invalid={Boolean(errors.linkedin)} aria-describedby="linkedin-hint" />
-      </Field>
-      <Field id="referral" label="How did you hear about Quad?" error={errors.referral}>
-        <Input id="referral" name="referral" className="h-11" aria-invalid={Boolean(errors.referral)} />
-      </Field>
-      <Field id="message" label="Message" error={errors.message}>
-        <Textarea id="message" name="message" rows={4} aria-invalid={Boolean(errors.message)} />
-      </Field>
-      <div className="flex items-start gap-3">
-        <Checkbox
-          id="consent"
-          checked={consent}
-          onCheckedChange={(value) => setConsent(value === true)}
-          aria-invalid={Boolean(errors.consent)}
-          aria-describedby={errors.consent ? "consent-error" : undefined}
+      <Field id="phone" label="Phone" optional error={errors.phone}>
+        <Input
+          id="phone"
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+          aria-invalid={Boolean(errors.phone)}
+          aria-describedby={errors.phone ? "phone-error" : undefined}
+          className="h-11"
         />
-        <div className="grid gap-1">
-          <Label htmlFor="consent" className="items-start leading-snug">
-            I agree that Quad Tech Solutions Inc. may use this information and my résumé for recruiting only.
-            <span aria-hidden="true" className="text-accent">
-              {" "}
-              *
-            </span>
-            <span className="sr-only"> (required)</span>
-          </Label>
-          {errors.consent ? (
-            <p id="consent-error" className="text-sm text-destructive" role="alert">
-              {errors.consent}
+      </Field>
+
+      <div className="grid gap-1.5">
+        <Label htmlFor="resume">
+          Résumé<span className="sr-only"> (required)</span>
+        </Label>
+        <div
+          onDragOver={(event) => {
+            event.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+          className={`rounded-lg border border-dashed p-4 text-center transition-colors ${
+            dragging ? "border-accent bg-accent/10" : "border-input bg-background/40"
+          } ${errors.resume ? "border-destructive" : ""}`}
+        >
+          <input
+            ref={fileInputRef}
+            id="resume"
+            name="resume"
+            type="file"
+            accept={RESUME_ACCEPT}
+            required
+            className="sr-only"
+            aria-invalid={Boolean(errors.resume)}
+            aria-describedby={errors.resume ? "resume-error resume-hint" : "resume-hint"}
+            onChange={(event) => pickResume(event.target.files?.[0] ?? null)}
+          />
+          {resumeFile ? (
+            <div className="flex items-center justify-between gap-3 text-left">
+              <span className="flex min-w-0 items-center gap-2 text-sm">
+                <FileText className="size-4 shrink-0 text-accent" aria-hidden />
+                <span className="truncate">{resumeFile.name}</span>
+                <span className="shrink-0 text-muted-foreground">{formatBytes(resumeFile.size)}</span>
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Remove the selected résumé"
+                onClick={() => {
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                  pickResume(null);
+                }}
+              >
+                <X className="size-4" aria-hidden />
+              </Button>
+            </div>
+          ) : (
+            <div className="grid justify-items-center gap-2">
+              <Upload className="size-5 text-muted-foreground" aria-hidden />
+              <p className="text-sm">
+                Drag your résumé here, or{" "}
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-sm text-accent"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  browse files
+                </Button>
+              </p>
+            </div>
+          )}
+        </div>
+        <p id="resume-hint" className="text-xs text-muted-foreground">
+          PDF, DOC, or DOCX, up to 5 MB.
+        </p>
+        {errors.resume ? (
+          <p id="resume-error" className="text-sm text-destructive" role="alert">
+            {errors.resume}
+          </p>
+        ) : null}
+      </div>
+
+      <Field id="linkedin" label="LinkedIn" optional error={errors.linkedin}>
+        <Input
+          id="linkedin"
+          name="linkedin"
+          type="url"
+          autoComplete="url"
+          placeholder="https://linkedin.com/in/…"
+          aria-invalid={Boolean(errors.linkedin)}
+          aria-describedby={errors.linkedin ? "linkedin-error" : undefined}
+          className="h-11"
+        />
+      </Field>
+
+      {props.kind === "job" ? (
+        <fieldset
+          className="grid gap-2"
+          aria-invalid={Boolean(errors.workAuthorization)}
+          aria-describedby={errors.workAuthorization ? "workAuthorization-error" : undefined}
+        >
+          <legend className="text-sm font-medium">
+            Are you authorized to work in {authCountry}?
+          </legend>
+          <div className="flex gap-6" id="workAuthorization">
+            <label className="flex items-center gap-2 text-sm">
+              <input type="radio" name="workAuthorization" value="yes" required className="size-4 accent-accent" />
+              Yes
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="radio" name="workAuthorization" value="no" className="size-4 accent-accent" />
+              No
+            </label>
+          </div>
+          {errors.workAuthorization ? (
+            <p id="workAuthorization-error" className="text-sm text-destructive" role="alert">
+              {errors.workAuthorization}
             </p>
           ) : null}
-        </div>
-      </div>
+        </fieldset>
+      ) : null}
+
       <Button type="submit" className="h-11" disabled={pending} aria-busy={pending}>
         {pending ? "Sending…" : "Submit application"}
       </Button>
+      <p className="text-xs text-muted-foreground">
+        By submitting this application, you agree that Quad Tech Solutions Inc. may store this
+        information and your résumé and contact you about roles. Nothing else is done with it.
+      </p>
     </form>
   );
 }

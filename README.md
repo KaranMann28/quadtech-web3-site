@@ -48,7 +48,7 @@ See [content/jobs/README.md](content/jobs/README.md). Roles with `draft: true` a
 | --- | --- |
 | `/` `/about` `/services` `/why-us` `/contact` | Existing public pages |
 | `/industries` and `/industries/[slug]` | Six customer categories |
-| `/careers` | Job board. Filters sync to the query string. |
+| `/careers` | Job board. One list grouped by service line, with a single search box. |
 | `/careers/[slug]` | Role detail and application |
 | `/careers/talent-network` | General application |
 | `/careers/thanks` | Confirmation after a successful submit |

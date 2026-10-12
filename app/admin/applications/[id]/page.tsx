@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { applicationStatusAction } from "@/lib/admin/actions";
 import { requireAdmin, redirectIfDenied } from "@/lib/admin/guard";
 import { APPLICATION_STATUSES, getApplication } from "@/lib/applications/store";
-import { countryName, WORK_AUTH_LABELS, type WorkAuth } from "@/lib/taxonomy";
+import { countryName, workAuthLabel } from "@/lib/taxonomy";
 
 export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,7 +15,6 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
   const { id } = await params;
   const application = await getApplication(id);
   if (!application) notFound();
-  const auth = application.workAuthorization as WorkAuth;
 
   return (
     <article className="grid max-w-3xl gap-6">
@@ -32,19 +31,25 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
         </div>
         <div>
           <dt className="text-muted-foreground">Phone</dt>
-          <dd>{application.phone}</dd>
+          <dd>{application.phone || "—"}</dd>
         </div>
-        <div>
-          <dt className="text-muted-foreground">City / region</dt>
-          <dd>{application.cityRegion}</dd>
-        </div>
+        {application.cityRegion ? (
+          <div>
+            <dt className="text-muted-foreground">City / region</dt>
+            <dd>{application.cityRegion}</dd>
+          </div>
+        ) : null}
         <div>
           <dt className="text-muted-foreground">Country</dt>
-          <dd>{countryName(application.country as "US" | "CA")}</dd>
+          <dd>
+            {application.country === "US" || application.country === "CA"
+              ? countryName(application.country)
+              : "—"}
+          </dd>
         </div>
         <div>
           <dt className="text-muted-foreground">Work authorization</dt>
-          <dd>{WORK_AUTH_LABELS[auth] ?? application.workAuthorization}</dd>
+          <dd>{workAuthLabel(application.workAuthorization, application.country)}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">Job</dt>
@@ -62,22 +67,26 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
           <dt className="text-muted-foreground">LinkedIn</dt>
           <dd>{application.linkedin || "—"}</dd>
         </div>
-        <div>
-          <dt className="text-muted-foreground">How they heard</dt>
-          <dd>{application.referral || "—"}</dd>
-        </div>
+        {application.referral ? (
+          <div>
+            <dt className="text-muted-foreground">How they heard</dt>
+            <dd>{application.referral}</dd>
+          </div>
+        ) : null}
       </dl>
-      <section>
-        <h2 className="text-xl font-semibold">Screening answers</h2>
-        <ul className="mt-2 grid gap-2 text-sm">
-          {application.screeners.map((item) => (
-            <li key={item.id}>
-              <span className="text-muted-foreground">{item.label}: </span>
-              {item.answer || "—"}
-            </li>
-          ))}
-        </ul>
-      </section>
+      {application.screeners.length > 0 ? (
+        <section>
+          <h2 className="text-xl font-semibold">Screening answers</h2>
+          <ul className="mt-2 grid gap-2 text-sm">
+            {application.screeners.map((item) => (
+              <li key={item.id}>
+                <span className="text-muted-foreground">{item.label}: </span>
+                {item.answer || "—"}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {application.message ? (
         <section>
           <h2 className="text-xl font-semibold">Message</h2>

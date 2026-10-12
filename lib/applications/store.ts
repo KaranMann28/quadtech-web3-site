@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Application as ApplicationRow } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
-import type { ApplicationFields } from "@/lib/apply/schema";
 import { storeResume, readResume } from "@/lib/resumes/storage";
 import { startOfUtcWeek } from "@/lib/jobs/visibility";
 
@@ -60,12 +59,21 @@ function toRecord(
   };
 }
 
+/**
+ * City/region, referral, message, and screener answers are no longer collected
+ * by the simplified apply form. Their columns stay for rows recorded before
+ * the 2026-10 simplification and are stored empty for new rows.
+ */
 export async function recordApplication(input: {
   jobId: string | null;
   kind: "job" | "talent-network";
-  fields: ApplicationFields;
+  fullName: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  country: string;
+  workAuthorization: string;
   serviceLine: string;
-  screeners: ScreenerAnswer[];
   resume: { filename: string; contentType: string; bytes: Buffer };
 }): Promise<string> {
   const id = randomUUID();
@@ -75,17 +83,17 @@ export async function recordApplication(input: {
       id,
       jobId: input.jobId,
       kind: input.kind,
-      fullName: input.fields.fullName,
-      email: input.fields.email,
-      phone: input.fields.phone,
-      cityRegion: input.fields.cityRegion,
-      country: input.fields.country,
-      workAuthorization: input.fields.workAuthorization,
-      linkedin: input.fields.linkedin,
-      referral: input.fields.referral,
-      message: input.fields.message,
+      fullName: input.fullName,
+      email: input.email,
+      phone: input.phone,
+      cityRegion: "",
+      country: input.country,
+      workAuthorization: input.workAuthorization,
+      linkedin: input.linkedin,
+      referral: "",
+      message: "",
       serviceLine: input.serviceLine,
-      screeners: JSON.stringify(input.screeners),
+      screeners: "[]",
       resumeKey,
       resumeFilename: input.resume.filename,
       resumeContentType: input.resume.contentType,
