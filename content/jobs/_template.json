@@ -1,0 +1,30 @@
+{
+  "slug": "replace-with-kebab-case-slug",
+  "jobId": "QT-JOB-YYYY-NNN",
+  "title": "Role title",
+  "serviceLine": "Drive & Walk Testing",
+  "industry": "wireless-carriers-oems",
+  "location": {
+    "city": "City",
+    "region": "Region",
+    "country": "US",
+    "mode": "Field"
+  },
+  "type": "Contract",
+  "durationWeeks": 12,
+  "payRange": {
+    "min": 1,
+    "max": 1,
+    "currency": "USD",
+    "unit": "hour"
+  },
+  "postedDate": "2026-01-01",
+  "closingDate": "2026-01-01",
+  "summary": "One card-sized paragraph. Replace this text and remove every TODO [CONFIRM] before setting draft to false.",
+  "responsibilities": ["Replace with confirmed duties."],
+  "requirements": ["Replace with confirmed requirements."],
+  "niceToHave": ["Optional."],
+  "travel": "Describe travel, or remove this field.",
+  "draft": true,
+  "internalNote": "TODO [CONFIRM] every unconfirmed value, then delete this note and set draft to false."
+}

@@ -1,0 +1,34 @@
+{
+  "slug": "senior-salesforce-functional-lead",
+  "jobId": "QT-JOB-2026-004",
+  "title": "Senior Salesforce Functional Lead",
+  "serviceLine": "Engineering Staffing",
+  "industry": "enterprise-venues",
+  "location": {
+    "city": "Toronto",
+    "region": "ON",
+    "country": "CA",
+    "mode": "Hybrid"
+  },
+  "type": "Contract",
+  "postedDate": "2026-10-12",
+  "summary": "Senior functional lead for a Salesforce delivery team. Own business-process design, requirements, and configuration decisions, and guide the build toward outcomes the business signs off on. Based in Toronto and open to candidates authorized to work in Canada.",
+  "responsibilities": [
+    "Lead discovery with business stakeholders and translate their processes into Salesforce solution designs.",
+    "Own functional requirements, user stories, and acceptance criteria through build, test, and release.",
+    "Guide configuration decisions across flows, objects, and permissions, and review work for fit and quality.",
+    "Run workshops, demos, and UAT cycles with business users and confirm functional readiness."
+  ],
+  "requirements": [
+    "Senior-level experience leading functional delivery on Salesforce programs.",
+    "Strong command of Salesforce platform capabilities and configuration trade-offs.",
+    "Clear written and verbal communication with business and technical stakeholders.",
+    "Authorized to work in Canada."
+  ],
+  "niceToHave": [
+    "Salesforce certifications, for example Administrator or a Sales/Service Cloud Consultant track.",
+    "Consulting or other client-facing delivery experience."
+  ],
+  "status": "published",
+  "internalNote": "Seeded 2026-10-12 from the vendor referral list (photo dated 2026-10-07): title, city, and one opening only. The vendor referral reward on that list is a sourcing detail and must never appear on the posting. Mode (Hybrid), type (Contract), industry (Enterprise & Venues), and the generic description are editorial defaults the owner should adjust in /admin if wrong. Pay is intentionally omitted."
+}

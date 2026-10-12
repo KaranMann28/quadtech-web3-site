@@ -1,0 +1,29 @@
+{
+  "slug": "field-test-engineer-drive-walk-xcal",
+  "jobId": "QT-JOB-2026-001",
+  "title": "Field Test Engineer — Drive & Walk Testing (XCAL)",
+  "serviceLine": "Drive & Walk Testing",
+  "industry": "wireless-carriers-oems",
+  "location": {
+    "city": "Mississauga",
+    "region": "ON",
+    "country": "CA",
+    "mode": "Field"
+  },
+  "type": "Contract",
+  "postedDate": "2026-01-01",
+  "summary": "Contract field role in Mississauga and the Greater Toronto Area for XCAL drive and walk testing, including overnight and venue shifts. Pay, dates, and whether this opening is live are TODO [CONFIRM].",
+  "responsibilities": [
+    "Collect drive and walk test data with XCAL.",
+    "Support carrier testing and benchmark data collection, including venue shifts.",
+    "Work overnight and venue shifts in the Greater Toronto Area when the assignment requires it."
+  ],
+  "requirements": [
+    "XCAL data collection experience.",
+    "Valid driver's license and a vehicle.",
+    "Comfortable with overnight and venue shifts."
+  ],
+  "travel": "Field work in Mississauga and the Greater Toronto Area, including overnight and venue shifts. Travel radius beyond the GTA is TODO [CONFIRM].",
+  "draft": true,
+  "internalNote": "TODO [CONFIRM] pay range (CAD, hour or day), postedDate, closingDate, durationWeeks, and that this opening is approved to publish. TODO [CONFIRM] industry tag if venue work should be enterprise-venues instead of wireless-carriers-oems. Placeholder postedDate 2026-01-01 must be replaced. Do not set draft to false until every TODO [CONFIRM] in this file is resolved."
+}

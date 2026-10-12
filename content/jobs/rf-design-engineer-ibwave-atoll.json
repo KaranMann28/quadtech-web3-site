@@ -1,0 +1,30 @@
+{
+  "slug": "rf-design-engineer-ibwave-atoll",
+  "jobId": "QT-JOB-2026-002",
+  "title": "RF Design Engineer — iBwave / ATOLL",
+  "serviceLine": "RF Engineering",
+  "industry": "neutral-host-das",
+  "location": {
+    "city": "Remote",
+    "region": "United States and Canada",
+    "country": "US",
+    "mode": "Remote"
+  },
+  "workCountries": ["US", "CA"],
+  "type": "Contract",
+  "postedDate": "2026-01-01",
+  "summary": "Remote contract RF design support for candidates in the United States or Canada, using iBwave and ATOLL. Pay, dates, certification level, and whether this opening is live are TODO [CONFIRM].",
+  "responsibilities": [
+    "Produce DAS designs in iBwave.",
+    "Support ATOLL RF design.",
+    "Provide a DAS design portfolio for review."
+  ],
+  "requirements": [
+    "iBwave certification level TODO [CONFIRM].",
+    "DAS design portfolio.",
+    "ATOLL experience."
+  ],
+  "travel": "Remote across the United States and Canada. On-site travel expectations are TODO [CONFIRM].",
+  "draft": true,
+  "internalNote": "TODO [CONFIRM] pay range and currency (USD or CAD), postedDate, closingDate, and durationWeeks. TODO [CONFIRM] iBwave certification level before publication. TODO [CONFIRM] serviceLine if this should be DAS & Public Safety Systems instead of RF Engineering. TODO [CONFIRM] which country is primary in location.country; workCountries lists both US and CA. Placeholder postedDate 2026-01-01 must be replaced. Do not set draft to false until every TODO [CONFIRM] in this file is resolved."
+}

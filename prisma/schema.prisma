@@ -1,0 +1,131 @@
+// Local SQLite only. Vercel/production uses prisma/postgres/schema.prisma
+// and a Neon postgres URL. See docs/DEPLOYMENT.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Job content matches lib/jobs/schema.ts. Status replaces the old draft boolean.
+/// Rows are never hard-deleted. Close, then archive.
+model Job {
+  id               String   @id @default(cuid())
+  jobId            String   @unique
+  slug             String   @unique
+  title            String
+  serviceLine      String
+  industry         String
+  city             String
+  region           String
+  country          String
+  mode             String
+  workCountries    String?
+  engagementType   String
+  durationWeeks    Int?
+  payMin           Float?
+  payMax           Float?
+  payCurrency      String?
+  payUnit          String?
+  postedDate       String
+  closingDate      String?
+  summary          String
+  responsibilities String
+  requirements     String
+  niceToHave       String?
+  travel           String?
+  internalNote     String?
+  status           String
+  archived         Boolean  @default(false)
+  slugLocked       Boolean  @default(false)
+  previousSlugs    String   @default("[]")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  createdBy        String
+  updatedBy        String
+  publishedAt      DateTime?
+  closedAt         DateTime?
+  applications     Application[]
+
+  @@index([status, archived])
+  @@index([closingDate])
+}
+
+model Application {
+  id                String   @id
+  jobId             String?
+  job               Job?     @relation(fields: [jobId], references: [jobId])
+  kind              String
+  fullName          String
+  email             String
+  phone             String
+  cityRegion        String
+  country           String
+  workAuthorization String
+  linkedin          String   @default("")
+  referral          String   @default("")
+  message           String   @default("")
+  serviceLine       String
+  screeners         String
+  resumeKey         String
+  resumeFilename    String
+  resumeContentType String
+  resumeBytes       Bytes?
+  status            String   @default("new")
+  submittedAt       DateTime @default(now())
+
+  @@index([submittedAt])
+  @@index([status])
+  @@index([jobId])
+}
+
+// Auth.js tables. Email magic links store a verification token here.
+// Sessions use JWT cookies, so Session rows are unused but the adapter expects the model.
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
