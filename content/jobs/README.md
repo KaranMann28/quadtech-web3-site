@@ -4,7 +4,7 @@ This folder is seed history. It is superseded by the admin UI at `/admin/jobs`.
 
 To post a job, sign in at `/admin` and use **Create post**. JSON files here are imported once by `jobId` and are not overwritten on later runs.
 
-The two Phase 1 field/RF files stay drafts. `project-administrator-contractor.json` (`QT-JOB-2026-003`) is the first published contractor role.
+The two Phase 1 field/RF files stay drafts. `project-administrator-contractor.json` (`QT-JOB-2026-003`) is the first published contractor role, and the three Salesforce roles (`QT-JOB-2026-004` to `006`) are published seeds from the October 2026 vendor list.
 
 ## Post a job
 
@@ -30,3 +30,8 @@ Two draft roles are checked in so the shape is real. They stay drafts until the 
 - `field-test-engineer-drive-walk-xcal.json` — `QT-JOB-2026-001` (draft)
 - `rf-design-engineer-ibwave-atoll.json` — `QT-JOB-2026-002` (draft)
 - `project-administrator-contractor.json` — `QT-JOB-2026-003` (published). Schema defaults: Remote / Canada / CA, Contract, Project Management, industry `wireless-carriers-oems`. Pay and duration omitted.
+- `senior-salesforce-functional-lead.json` — `QT-JOB-2026-004` (published, Toronto)
+- `senior-salesforce-technical-lead.json` — `QT-JOB-2026-005` (published, Montreal or Toronto)
+- `senior-bsa-data-migration-specialist-salesforce.json` — `QT-JOB-2026-006` (published, Montreal or Toronto)
+
+The three Salesforce seeds come from an October 2026 vendor referral list that named only titles, cities, and one opening each. Editorial defaults (Hybrid, Contract, industry `enterprise-venues`) and the generic descriptions are noted in each file's `internalNote` for the owner to adjust in `/admin`. Vendor referral rewards from that list are never published.

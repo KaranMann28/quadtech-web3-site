@@ -158,14 +158,25 @@ test("import is idempotent and drafts stay off the public board", async () => {
   await resetPrisma();
   const store = await import("@/lib/jobs/store");
   const seeds = loadSeedJobs();
+  const allIds = [
+    "QT-JOB-2026-001",
+    "QT-JOB-2026-002",
+    "QT-JOB-2026-003",
+    "QT-JOB-2026-004",
+    "QT-JOB-2026-005",
+    "QT-JOB-2026-006",
+  ];
   const first = await store.importSeedJobs(seeds);
   const second = await store.importSeedJobs(seeds);
-  assert.deepEqual(first.inserted.sort(), ["QT-JOB-2026-001", "QT-JOB-2026-002", "QT-JOB-2026-003"]);
-  assert.deepEqual(second.skipped.sort(), ["QT-JOB-2026-001", "QT-JOB-2026-002", "QT-JOB-2026-003"]);
+  assert.deepEqual(first.inserted.sort(), allIds);
+  assert.deepEqual(second.skipped.sort(), allIds);
   assert.equal(second.inserted.length, 0);
   const published = await store.getPublishedJobs();
-  assert.equal(published.length, 1);
-  assert.equal(published[0]?.jobId, "QT-JOB-2026-003");
+  assert.equal(published.length, 4);
+  assert.deepEqual(
+    published.map((job) => job.jobId).sort(),
+    ["QT-JOB-2026-003", "QT-JOB-2026-004", "QT-JOB-2026-005", "QT-JOB-2026-006"],
+  );
   assert.equal(await store.getPublishedJob("field-test-engineer-drive-walk-xcal"), undefined);
   const hidden = await store.resolvePublicSlug("field-test-engineer-drive-walk-xcal");
   assert.equal(hidden.kind, "missing");
@@ -192,14 +203,14 @@ test("duplicate assigns a new id and a closed post leaves the public list", asyn
     "allowed.admin@quadtechsolutions.com",
     new Date("2026-06-15T12:00:00Z"),
   );
-  assert.equal(created.jobId, "QT-JOB-2026-004");
+  assert.equal(created.jobId, "QT-JOB-2026-007");
   const published = await store.setJobStatus(created.jobId, "published", "allowed.admin@quadtechsolutions.com");
   assert.equal(published.status, "published");
   assert.equal(published.slugLocked, true);
   assert.equal((await store.getPublishedJobs()).some((job) => job.jobId === created.jobId), true);
 
   const copy = await store.duplicateJob(created.jobId, "allowed.admin@quadtechsolutions.com", new Date("2026-07-01T00:00:00Z"));
-  assert.equal(copy.jobId, "QT-JOB-2026-005");
+  assert.equal(copy.jobId, "QT-JOB-2026-008");
   assert.equal(copy.status, "draft");
   assert.notEqual(copy.slug, published.slug);
 

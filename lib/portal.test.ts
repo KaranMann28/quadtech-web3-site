@@ -53,18 +53,34 @@ function baseForm(kind: "job" | "talent-network"): FormData {
 
 test("published jobs exclude drafts and the template", () => {
   const jobs = loadSeedJobs();
-  assert.equal(jobs.length, 3);
+  assert.equal(jobs.length, 6);
   const drafts = jobs.filter((job) => job.status === "draft");
   const published = jobs.filter((job) => job.status === "published");
   assert.equal(drafts.length, 2);
-  assert.equal(published.length, 1);
-  assert.equal(published[0]?.jobId, "QT-JOB-2026-003");
-  assert.equal(published[0]?.title, "Project Administrator (Contractor)");
+  assert.equal(published.length, 4);
+  assert.deepEqual(
+    published.map((job) => job.jobId).sort(),
+    ["QT-JOB-2026-003", "QT-JOB-2026-004", "QT-JOB-2026-005", "QT-JOB-2026-006"],
+  );
   assert.deepEqual(
     jobs.map((job) => job.jobId).sort(),
-    ["QT-JOB-2026-001", "QT-JOB-2026-002", "QT-JOB-2026-003"],
+    [
+      "QT-JOB-2026-001",
+      "QT-JOB-2026-002",
+      "QT-JOB-2026-003",
+      "QT-JOB-2026-004",
+      "QT-JOB-2026-005",
+      "QT-JOB-2026-006",
+    ],
   );
-  assert.equal(loadJobsFromDir(jobsDir()).length, 3);
+  const salesforce = published.filter((job) => job.title.includes("Salesforce"));
+  assert.equal(salesforce.length, 3);
+  for (const job of salesforce) {
+    assert.equal(job.location.country, "CA");
+    assert.equal(job.payRange, undefined);
+    assert.ok(!JSON.stringify(job).toLowerCase().includes("karma"), "vendor rewards must not ship");
+  }
+  assert.equal(loadJobsFromDir(jobsDir()).length, 6);
 });
 
 test("loader rejects a public role that still has TODO [CONFIRM]", () => {

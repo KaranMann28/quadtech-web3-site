@@ -1,0 +1,35 @@
+{
+  "slug": "senior-salesforce-technical-lead",
+  "jobId": "QT-JOB-2026-005",
+  "title": "Senior Salesforce Technical Lead",
+  "serviceLine": "Engineering Staffing",
+  "industry": "enterprise-venues",
+  "location": {
+    "city": "Montreal or Toronto",
+    "region": "QC/ON",
+    "country": "CA",
+    "mode": "Hybrid"
+  },
+  "type": "Contract",
+  "postedDate": "2026-10-12",
+  "summary": "Senior technical lead for a Salesforce delivery team. Own solution architecture, development standards, and the technical quality of the build and its integrations. Based in Montreal or Toronto and open to candidates authorized to work in Canada.",
+  "responsibilities": [
+    "Own technical design and architecture decisions across the Salesforce org and its integrations.",
+    "Set development standards and review Apex, Lightning Web Components, and declarative work.",
+    "Plan environments, releases, and deployment pipelines with the delivery team.",
+    "Work with the functional lead to turn requirements into buildable, maintainable solutions."
+  ],
+  "requirements": [
+    "Senior-level experience as a technical lead or architect on Salesforce programs.",
+    "Hands-on depth in Apex, Lightning Web Components, and Salesforce integration patterns.",
+    "Experience with release management and deployment tooling for Salesforce.",
+    "Authorized to work in Canada."
+  ],
+  "niceToHave": [
+    "Salesforce Platform Developer or Architect certifications.",
+    "Experience integrating Salesforce with enterprise systems and middleware.",
+    "Fluency in French and English."
+  ],
+  "status": "published",
+  "internalNote": "Seeded 2026-10-12 from the vendor referral list (photo dated 2026-10-07): title, cities, and one opening only. The vendor referral reward on that list is a sourcing detail and must never appear on the posting. Mode (Hybrid), type (Contract), industry (Enterprise & Venues), and the generic description are editorial defaults the owner should adjust in /admin if wrong. Pay is intentionally omitted."
+}
