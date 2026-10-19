@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { isQuoteTopic, messageForTopic, topicLabel } from "@/lib/quote-topics";
 
 type FieldErrors = Record<string, string>;
 
 export function ContactForm() {
+  const searchParams = useSearchParams();
+  const topic = searchParams.get("topic");
+  const draft = messageForTopic(topic);
   const summaryRef = useRef<HTMLDivElement>(null);
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState(false);
@@ -94,7 +99,18 @@ export function ContactForm() {
         <Label htmlFor="contact-message">
           Message <span className="sr-only">(required)</span>
         </Label>
-        <Textarea id="contact-message" name="message" required rows={5} aria-invalid={Boolean(errors.message)} />
+        {isQuoteTopic(topic) ? (
+          <p className="text-sm text-muted-foreground">Topic: {topicLabel(topic)}</p>
+        ) : null}
+        <Textarea
+          key={topic ?? "default"}
+          id="contact-message"
+          name="message"
+          required
+          rows={6}
+          defaultValue={draft}
+          aria-invalid={Boolean(errors.message)}
+        />
         {errors.message ? <p className="text-sm text-destructive">{errors.message}</p> : null}
       </div>
       <Button type="submit" className="h-11 w-fit px-4" disabled={pending}>

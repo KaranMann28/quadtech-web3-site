@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { BuyerServiceCard } from "@/components/buyer-service-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { buyerServices } from "@/content/buyer-services";
 import { company } from "@/lib/company";
-import { services } from "@/lib/services";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const facts = [
@@ -64,24 +64,28 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold md:text-5xl">Services</h2>
         <p className="mt-4 max-w-3xl text-lg text-muted-foreground">
-          Field and engineering work Quad performs for telecom infrastructure clients.
+          Field and engineering work for carriers, integrators, OEMs, ISPs, and municipalities.
         </p>
         <ul className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {services.map((service) => (
+          {buyerServices.map((service) => (
             <li key={service.slug}>
-              <Card className="h-full text-base">
-                <CardContent className="grid h-full gap-3">
-                  <h3 className="text-xl font-semibold">
-                    <Link href={`/services#${service.slug}`} className="hover:text-accent">
-                      {service.name}
-                    </Link>
-                  </h3>
-                  <p className="text-sm text-muted-foreground">{service.summary}</p>
-                </CardContent>
-              </Card>
+              <BuyerServiceCard service={service} />
             </li>
           ))}
         </ul>
+        <p className="mt-8">
+          <Link href="/services" className="text-accent">
+            All services
+          </Link>
+          {" · "}
+          <Link href="/work" className="text-accent">
+            How we work
+          </Link>
+          {" · "}
+          <Link href="/capabilities" className="text-accent">
+            Capabilities one-pager
+          </Link>
+        </p>
       </section>
       <section className="border-t border-border bg-gradient-to-b from-background to-muted/40">
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">

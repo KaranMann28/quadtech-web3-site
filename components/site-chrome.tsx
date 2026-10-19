@@ -13,11 +13,13 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="flex-1 pt-16">
+      <main id="main" className="flex-1 pt-16 print:pt-0">
         {children}
       </main>
       <SiteFooter />
-      <AIChatbot />
+      <div className="print:hidden">
+        <AIChatbot />
+      </div>
     </>
   );
 }

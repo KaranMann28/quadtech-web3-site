@@ -161,6 +161,20 @@ export function getService(slug: string): Service | undefined {
   return services.find((service) => service.slug === slug);
 }
 
+/** Public page for a catalog slug. Dedicated buyer pages where they exist. */
+export function serviceHref(slug: ServiceSlug): string {
+  switch (slug) {
+    case "das-public-safety":
+      return "/services/das";
+    case "drive-walk-testing":
+    case "cw-testing":
+    case "field-services":
+      return "/services/field-testing";
+    default:
+      return `/services#${slug}`;
+  }
+}
+
 /** Old /services hash links, mapped to the closest confirmed service. */
 export const legacyServiceAnchors: Record<string, ServiceSlug> = {
   "network-design": "wireless-network-design",

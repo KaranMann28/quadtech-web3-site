@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { clientIp, rateLimit } from "@/lib/apply/rate-limit";
+import { buyerServices } from "@/content/buyer-services";
 import { company } from "@/lib/company";
 import { services } from "@/lib/services";
 
@@ -15,9 +16,10 @@ const offices = company.offices
   .join(" and ");
 
 /**
- * Prompt facts come from lib/company.ts and lib/services.ts only. The previous
- * site's chatbot prompt carried a placeholder phone number and an unconfirmed
- * inbox; neither may be published, so the model is pointed at /contact instead.
+ * Prompt facts come from lib/company.ts, content/buyer-services.ts, and
+ * lib/services.ts only. The previous site's chatbot prompt carried a
+ * placeholder phone number and an unconfirmed inbox; neither may be published,
+ * so the model is pointed at /contact instead.
  */
 const SYSTEM_PROMPT = `You are the AI assistant on the ${company.legalName} website (quadtechsolutions.io). You help visitors with telecom and network infrastructure questions.
 
@@ -27,11 +29,14 @@ COMPANY FACTS (the only company facts you may state):
 - Clients are served across the ${company.markets.join(" and ")}.
 
 SERVICES:
-${services.map((service) => `- ${service.name}: ${service.summary}`).join("\n")}
+${buyerServices.map((service) => `- ${service.name}: ${service.summary}`).join("\n")}
+Catalog lines: ${services.map((service) => service.name).join("; ")}.
+
+Public pages: /services, /services/das, /services/public-safety-radio, /services/field-testing, /work, /capabilities.
 
 YOUR ROLE:
 - Give clear technical guidance on telecom and network engineering topics.
-- Help visitors work out which services fit their project, and encourage them to send details through the contact form at /contact.
+- Help visitors work out which services fit their project, and encourage them to send details through the contact form at /contact (quote links use ?topic=).
 - Point people asking about jobs to the careers board at /careers.
 
 GUIDELINES:

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { PageHero } from "@/components/page-hero";
 import { Button } from "@/components/ui/button";
 import { getIndustry, industries } from "@/lib/industries";
-import { getService } from "@/lib/services";
+import { getService, serviceHref } from "@/lib/services";
 
 export function generateStaticParams() {
   return industries.map((industry) => ({ slug: industry.slug }));
@@ -64,7 +64,7 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[s
           {tags.map((service) => (
             <li key={service.slug}>
               <Link
-                href={`/services#${service.slug}`}
+                href={serviceHref(service.slug)}
                 className="inline-flex rounded-full border border-border px-3 py-1 text-sm hover:border-accent hover:text-accent"
               >
                 {service.name}
