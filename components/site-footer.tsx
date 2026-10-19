@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LinkedInFollow } from "@/components/linkedin-follow";
 import { Logo } from "@/components/logo";
 import { company } from "@/lib/company";
 import { industries } from "@/lib/industries";
@@ -12,12 +13,15 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <Link href="/" className="mb-4 flex items-center gap-3">
-            <Logo className="size-8 text-accent" />
+            <Logo className="size-8" />
             <span className="gradient-text text-lg font-bold">{WORDMARK}</span>
           </Link>
           <p className="max-w-md text-sm text-muted-foreground">
             Unleashing the potential of Telecom. Wireless and wireline network design, optimization,
             and field engineering for clients in the United States and Canada.
+          </p>
+          <p className="mt-4">
+            <LinkedInFollow className="text-sm text-accent hover:underline" />
           </p>
         </div>
         <div>

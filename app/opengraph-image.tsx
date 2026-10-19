@@ -1,10 +1,15 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const alt = "Quad Tech Solutions Inc. — telecom engineering and field services";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const logo = await readFile(join(process.cwd(), "public/logo.png"));
+  const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -19,8 +24,19 @@ export default function OpenGraphImage() {
           padding: "72px",
         }}
       >
-        <div style={{ display: "flex", fontSize: 28, color: "#00d4ff", letterSpacing: 4 }}>
-          QUADTECH SOLUTIONS
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img src={logoSrc} width={96} height={96} alt="" />
+          <div
+            style={{
+              display: "flex",
+              marginLeft: 24,
+              fontSize: 28,
+              color: "#00d4ff",
+              letterSpacing: 4,
+            }}
+          >
+            QUADTECH SOLUTIONS
+          </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", fontSize: 64, fontWeight: 700, lineHeight: 1.1 }}>

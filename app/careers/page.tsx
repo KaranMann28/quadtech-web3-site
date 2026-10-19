@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JobBoard } from "@/components/job-board";
+import { LinkedInFollow } from "@/components/linkedin-follow";
 import { PageHero } from "@/components/page-hero";
 import { getPublishedJobs } from "@/lib/jobs/store";
 
@@ -19,6 +20,9 @@ export default async function CareersPage() {
         <p>
           Engineering, field, and delivery assignments in the United States and Canada. Applying
           takes under a minute: name, email, and résumé.
+        </p>
+        <p className="mt-4 text-base">
+          <LinkedInFollow />
         </p>
       </PageHero>
       <JobBoard jobs={jobs} />

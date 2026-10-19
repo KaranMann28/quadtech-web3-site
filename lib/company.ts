@@ -33,7 +33,8 @@ export const company = {
 // Careers inbox confirmed: HR@quadtechsolutions.com. Set APPLY_TO_EMAIL.
 // TODO [CONFIRM] Phone numbers. The previous site showed placeholder telephone numbers. They are not published.
 // TODO [CONFIRM] Business hours and response-time claims from the old contact page. Removed until confirmed.
-// TODO [CONFIRM] Social profile URLs. The old footer linked Facebook, LinkedIn, and X to /#. Removed until confirmed.
+// TODO [CONFIRM] Social profile URLs. LinkedIn is published from LINKEDIN_URL in lib/site.ts
+// (conventional company slug, unconfirmed). Facebook and X stay unpublished.
 // TODO [CONFIRM] Newsletter provider. The old subscribe form had no backend and was removed.
 // TODO [CONFIRM] Mail provider for applications (APPLY_SMTP_* or a hosted provider).
 // TODO [CONFIRM] Virus-scanning provider for résumé uploads. Type and size checks run now; a malware scanner is not connected.
