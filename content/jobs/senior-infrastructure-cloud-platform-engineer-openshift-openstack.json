@@ -1,0 +1,59 @@
+{
+  "slug": "senior-infrastructure-cloud-platform-engineer-openshift-openstack",
+  "jobId": "QT-JOB-2026-007",
+  "title": "Senior Infrastructure / Cloud Platform Engineer – OpenShift & OpenStack",
+  "serviceLine": "Engineering Staffing",
+  "industry": "wireless-carriers-oems",
+  "location": {
+    "city": "India",
+    "region": "as per project needs",
+    "country": "IN",
+    "mode": "Hybrid"
+  },
+  "workAuthorizationCountry": "IN",
+  "type": "Contract",
+  "postedDate": "2026-10-19",
+  "summary": "Senior infrastructure and cloud platform engineer for a national telecom carrier. Deploy, operate, and optimize Red Hat OpenShift and OpenStack platforms that support containerized and cloud-native workloads across private and hybrid cloud. Hands-on Kubernetes, Linux, and infrastructure operations, plus hardware-vendor coordination for platform lifecycle. Hybrid in India as per project needs, and open to candidates authorized to work in India.",
+  "responsibilities": [
+    "Platform Engineering & Operations:",
+    "Provide Day 2 support on the client's Red Hat OpenShift clusters across non-production and production environments.",
+    "Perform day-to-day administration of Kubernetes clusters, including upgrades, patching, scaling, and troubleshooting.",
+    "Monitor managed environments with the client's existing toolsets, including PagerDuty, NuRemedy, and Cloud Health, and use metrics and logs to identify and remediate issues.",
+    "Follow the client's change management process to schedule change activities after consultation with the client.",
+    "Lead hardware lifecycle management across NFVi infrastructure, including system board replacements, DIMM swaps, disk replacements, and NIC upgrades on controller and compute nodes, and manage storage, compute, and network integrations used by cloud and container platforms.",
+    "Participate in root-cause analysis and drive preventive actions for recurring incidents.",
+    "Vendor & Hardware Management:",
+    "Act as the technical liaison with hardware vendors such as HPE and IBM for troubleshooting, diagnostics, RMA and replacement coordination, and firmware compatibility and upgrade planning.",
+    "Coordinate with vendors, tenants, and field technicians, and track hardware-related issues through closure against vendor SLAs.",
+    "Automation, DevOps & Continuous Improvement:",
+    "Develop and maintain automation using Ansible, Kubernetes operators, or shell scripting, and support CI/CD and GitOps-based deployment models for platform services.",
+    "Contribute to standardization, documentation, and operational runbooks, and drive continuous improvement of platform reliability, security, and efficiency.",
+    "Support vulnerability remediation and security hardening in OpenShift, Kubernetes, and OpenStack environments, following client delivery and operational standards."
+  ],
+  "requirements": [
+    "Strong hands-on experience with Red Hat OpenShift (installation, operations, upgrades).",
+    "Solid experience with Kubernetes concepts and administration.",
+    "Experience working with OpenStack (Nova, Neutron, Cinder, Glance, Keystone).",
+    "Strong Linux system administration experience (RHEL/CentOS).",
+    "Experience troubleshooting complex infrastructure and platform issues in production environments.",
+    "Experience working with enterprise hardware platforms and liaising with vendors such as HPE, IBM, or equivalent for hardware support and replacements.",
+    "Understanding of server, storage, and network dependencies in private cloud environments.",
+    "Experience with automation and configuration management tools such as Ansible.",
+    "Exposure to monitoring and logging tools such as Prometheus, Grafana, and ELK.",
+    "Authorized to work in India.",
+    "Soft skills:",
+    "Strong problem-solving and analytical skills, with the ability to work independently and collaborate across global teams.",
+    "Clear communication skills when engaging with vendors, customers, and internal stakeholders.",
+    "Operational mindset focused on stability, quality, and continuous improvement, including the ability to work under pressure and manage multiple priorities."
+  ],
+  "niceToHave": [
+    "OpenShift, Kubernetes, or Red Hat certifications (RHCSA, RHCE).",
+    "Experience in telecom, managed services, or large-scale enterprise environments.",
+    "Exposure to hybrid cloud or integration with public cloud services (AWS/Azure).",
+    "Experience working in 24x7 support or on-call environments.",
+    "Scripting skills in Bash or Python."
+  ],
+  "travel": "Hybrid assignment in India as per project needs. Coordination with vendors, tenants, and field technicians is part of the role.",
+  "status": "published",
+  "internalNote": "Seeded 2026-10-19 from a client job description for a national telecom carrier assignment. Client and supplier names, pay, and client-internal process names were removed for the public repo. Mode (Hybrid), type (Contract), industry (Wireless Carriers & OEMs), location India, and workAuthorizationCountry IN are as specified. Pay and duration omitted."
+}

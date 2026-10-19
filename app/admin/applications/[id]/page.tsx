@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { applicationStatusAction } from "@/lib/admin/actions";
 import { requireAdmin, redirectIfDenied } from "@/lib/admin/guard";
 import { APPLICATION_STATUSES, getApplication } from "@/lib/applications/store";
-import { countryName, workAuthLabel } from "@/lib/taxonomy";
+import { countryName, isCountryCode, workAuthLabel } from "@/lib/taxonomy";
 
 export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   try {
@@ -42,9 +42,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
         <div>
           <dt className="text-muted-foreground">Country</dt>
           <dd>
-            {application.country === "US" || application.country === "CA"
-              ? countryName(application.country)
-              : "—"}
+            {isCountryCode(application.country) ? countryName(application.country) : "—"}
           </dd>
         </div>
         <div>

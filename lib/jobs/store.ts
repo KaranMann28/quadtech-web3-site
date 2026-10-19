@@ -10,6 +10,7 @@ import {
   type PublicJob,
 } from "@/lib/jobs/schema";
 import { closedPostState } from "@/lib/jobs/visibility";
+import { DEFAULT_WORK_AUTH_COUNTRY, isCountryCode } from "@/lib/taxonomy";
 
 export type JobRecord = Job & {
   createdAt: Date;
@@ -69,6 +70,9 @@ export function rowToRecord(row: JobRow, applicationCount?: number): JobRecord {
       mode: row.mode,
     },
     workCountries: parseList(row.workCountries),
+    workAuthorizationCountry: isCountryCode(row.workAuthorizationCountry)
+      ? row.workAuthorizationCountry
+      : undefined,
     type: row.engagementType,
     durationWeeks: row.durationWeeks ?? undefined,
     payRange:
@@ -117,6 +121,7 @@ function contentData(input: JobWrite): Prisma.JobUpdateInput {
     country: job.location.country,
     mode: job.location.mode,
     workCountries: jsonList(job.workCountries),
+    workAuthorizationCountry: job.workAuthorizationCountry ?? DEFAULT_WORK_AUTH_COUNTRY,
     engagementType: job.type,
     durationWeeks: job.durationWeeks ?? null,
     payMin: job.payRange?.min ?? null,
@@ -241,6 +246,7 @@ export async function createJob(content: JobFormInput, actor: string, now = new 
         country: full.location.country,
         mode: full.location.mode,
         workCountries: jsonList(full.workCountries),
+        workAuthorizationCountry: full.workAuthorizationCountry ?? DEFAULT_WORK_AUTH_COUNTRY,
         engagementType: full.type,
         durationWeeks: full.durationWeeks ?? null,
         payMin: full.payRange?.min ?? null,
@@ -379,6 +385,7 @@ export async function importSeedJobs(jobs: Job[]): Promise<{ inserted: string[];
         country: job.location.country,
         mode: job.location.mode,
         workCountries: jsonList(job.workCountries),
+        workAuthorizationCountry: job.workAuthorizationCountry ?? DEFAULT_WORK_AUTH_COUNTRY,
         engagementType: job.type,
         durationWeeks: job.durationWeeks ?? null,
         payMin: job.payRange?.min ?? null,

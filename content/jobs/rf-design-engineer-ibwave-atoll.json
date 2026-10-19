@@ -11,6 +11,7 @@
     "mode": "Remote"
   },
   "workCountries": ["US", "CA"],
+  "workAuthorizationCountry": "US",
   "type": "Contract",
   "postedDate": "2026-01-01",
   "summary": "Remote contract RF design support for candidates in the United States or Canada, using iBwave and ATOLL. Pay, dates, certification level, and whether this opening is live are TODO [CONFIRM].",

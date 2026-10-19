@@ -4,7 +4,7 @@ This folder is seed history. It is superseded by the admin UI at `/admin/jobs`.
 
 To post a job, sign in at `/admin` and use **Create post**. JSON files here are imported once by `jobId` and are not overwritten on later runs.
 
-The two Phase 1 field/RF files stay drafts. `project-administrator-contractor.json` (`QT-JOB-2026-003`) is the first published contractor role, and the three Salesforce roles (`QT-JOB-2026-004` to `006`) are published seeds from the October 2026 vendor list.
+The two Phase 1 field/RF files stay drafts. `project-administrator-contractor.json` (`QT-JOB-2026-003`) is the first published contractor role, the three Salesforce roles (`QT-JOB-2026-004` to `006`) are published seeds from the October 2026 vendor list, and `QT-JOB-2026-007` is the published OpenShift/OpenStack infrastructure role.
 
 ## Post a job
 
@@ -21,7 +21,11 @@ The two Phase 1 field/RF files stay drafts. `project-administrator-contractor.js
 
 ## Dual-country remote roles
 
-`location.country` is a single `US` or `CA` value. If the role is open in both countries, set `workCountries` to `["US", "CA"]`. The board country filter matches either value. Say which currency applies in `payRange.currency` (`USD` or `CAD`).
+`location.country` is a `US`, `CA`, or `IN` value. If the role is open in more than one country, set `workCountries` to those codes. The board country filter matches either value. Say which currency applies in `payRange.currency` (`USD` or `CAD`).
+
+## Work authorization country
+
+`workAuthorizationCountry` is the country named on the apply form's yes/no question. It is independent of `location.country`. Omit it to default to Canada so existing roles keep asking about Canada. Set `IN` for India-based roles.
 
 ## Seed files
 
@@ -33,5 +37,6 @@ Two draft roles are checked in so the shape is real. They stay drafts until the 
 - `senior-salesforce-functional-lead.json` — `QT-JOB-2026-004` (published, Toronto)
 - `senior-salesforce-technical-lead.json` — `QT-JOB-2026-005` (published, Montreal or Toronto)
 - `senior-bsa-data-migration-specialist-salesforce.json` — `QT-JOB-2026-006` (published, Montreal or Toronto)
+- `senior-infrastructure-cloud-platform-engineer-openshift-openstack.json` — `QT-JOB-2026-007` (published, Hybrid India). `workAuthorizationCountry` is `IN`. Client and supplier names are not in the public copy.
 
 The three Salesforce seeds come from an October 2026 vendor referral list that named only titles, cities, and one opening each. Editorial defaults (Hybrid, Contract, industry `enterprise-venues`) and the generic descriptions are noted in each file's `internalNote` for the owner to adjust in `/admin`. Vendor referral rewards from that list are never published.

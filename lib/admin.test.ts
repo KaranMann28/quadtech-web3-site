@@ -156,6 +156,7 @@ test("import is idempotent and drafts stay off the public board", async () => {
     "QT-JOB-2026-004",
     "QT-JOB-2026-005",
     "QT-JOB-2026-006",
+    "QT-JOB-2026-007",
   ];
   const first = await store.importSeedJobs(seeds);
   const second = await store.importSeedJobs(seeds);
@@ -163,16 +164,29 @@ test("import is idempotent and drafts stay off the public board", async () => {
   assert.deepEqual(second.skipped.sort(), allIds);
   assert.equal(second.inserted.length, 0);
   const published = await store.getPublishedJobs();
-  assert.equal(published.length, 4);
+  assert.equal(published.length, 5);
   assert.deepEqual(
     published.map((job) => job.jobId).sort(),
-    ["QT-JOB-2026-003", "QT-JOB-2026-004", "QT-JOB-2026-005", "QT-JOB-2026-006"],
+    [
+      "QT-JOB-2026-003",
+      "QT-JOB-2026-004",
+      "QT-JOB-2026-005",
+      "QT-JOB-2026-006",
+      "QT-JOB-2026-007",
+    ],
   );
   assert.equal(await store.getPublishedJob("field-test-engineer-drive-walk-xcal"), undefined);
   const hidden = await store.resolvePublicSlug("field-test-engineer-drive-walk-xcal");
   assert.equal(hidden.kind, "missing");
   const live = await store.resolvePublicSlug("project-administrator-contractor-2026-003");
   assert.equal(live.kind, "published");
+  const openshift = await store.getPublishedJob(
+    "senior-infrastructure-cloud-platform-engineer-openshift-openstack",
+  );
+  assert.equal(openshift?.workAuthorizationCountry, "IN");
+  assert.equal(openshift?.location.country, "IN");
+  const salesforce = await store.getPublishedJob("senior-salesforce-functional-lead");
+  assert.equal(salesforce?.workAuthorizationCountry, "CA");
 });
 
 test("duplicate assigns a new id and a closed post leaves the public list", async () => {
@@ -194,14 +208,14 @@ test("duplicate assigns a new id and a closed post leaves the public list", asyn
     "allowed.admin@quadtechsolutions.com",
     new Date("2026-06-15T12:00:00Z"),
   );
-  assert.equal(created.jobId, "QT-JOB-2026-007");
+  assert.equal(created.jobId, "QT-JOB-2026-008");
   const published = await store.setJobStatus(created.jobId, "published", "allowed.admin@quadtechsolutions.com");
   assert.equal(published.status, "published");
   assert.equal(published.slugLocked, true);
   assert.equal((await store.getPublishedJobs()).some((job) => job.jobId === created.jobId), true);
 
   const copy = await store.duplicateJob(created.jobId, "allowed.admin@quadtechsolutions.com", new Date("2026-07-01T00:00:00Z"));
-  assert.equal(copy.jobId, "QT-JOB-2026-008");
+  assert.equal(copy.jobId, "QT-JOB-2026-009");
   assert.equal(copy.status, "draft");
   assert.notEqual(copy.slug, published.slug);
 

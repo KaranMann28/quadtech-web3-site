@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { listApplications } from "@/lib/applications/store";
 import { handleApplication } from "@/lib/apply/process";
 import { validateResume } from "@/lib/apply/files";
 import { rateLimit, resetRateLimits } from "@/lib/apply/rate-limit";
@@ -11,6 +12,8 @@ import { groupJobsByServiceLine, searchJobs } from "@/lib/jobs/search";
 import { jobsDir, loadJobsFromDir, loadSeedJobs } from "@/lib/jobs/load";
 import type { PublicJob } from "@/lib/jobs/schema";
 import { jobPostingJsonLd } from "@/lib/jobs/jsonld";
+import { groupedLines } from "@/lib/jobs/filter";
+import { workAuthCountry, workAuthLabel, countryName } from "@/lib/taxonomy";
 
 const sample = (overrides: Partial<PublicJob> = {}): PublicJob => ({
   slug: "sample-role",
@@ -49,14 +52,20 @@ function baseForm(kind: "job" | "talent-network"): FormData {
 
 test("published jobs exclude drafts and the template", () => {
   const jobs = loadSeedJobs();
-  assert.equal(jobs.length, 6);
+  assert.equal(jobs.length, 7);
   const drafts = jobs.filter((job) => job.status === "draft");
   const published = jobs.filter((job) => job.status === "published");
   assert.equal(drafts.length, 2);
-  assert.equal(published.length, 4);
+  assert.equal(published.length, 5);
   assert.deepEqual(
     published.map((job) => job.jobId).sort(),
-    ["QT-JOB-2026-003", "QT-JOB-2026-004", "QT-JOB-2026-005", "QT-JOB-2026-006"],
+    [
+      "QT-JOB-2026-003",
+      "QT-JOB-2026-004",
+      "QT-JOB-2026-005",
+      "QT-JOB-2026-006",
+      "QT-JOB-2026-007",
+    ],
   );
   assert.deepEqual(
     jobs.map((job) => job.jobId).sort(),
@@ -67,16 +76,28 @@ test("published jobs exclude drafts and the template", () => {
       "QT-JOB-2026-004",
       "QT-JOB-2026-005",
       "QT-JOB-2026-006",
+      "QT-JOB-2026-007",
     ],
   );
   const salesforce = published.filter((job) => job.title.includes("Salesforce"));
   assert.equal(salesforce.length, 3);
   for (const job of salesforce) {
     assert.equal(job.location.country, "CA");
+    assert.equal(workAuthCountry(job), "CA");
     assert.equal(job.payRange, undefined);
     assert.ok(!JSON.stringify(job).toLowerCase().includes("karma"), "vendor rewards must not ship");
   }
-  assert.equal(loadJobsFromDir(jobsDir()).length, 6);
+  const india = published.find((job) => job.jobId === "QT-JOB-2026-007");
+  assert.ok(india);
+  assert.equal(india.location.country, "IN");
+  assert.equal(india.location.mode, "Hybrid");
+  assert.equal(india.type, "Contract");
+  assert.equal(india.workAuthorizationCountry, "IN");
+  assert.equal(workAuthCountry(india), "IN");
+  const indiaText = JSON.stringify(india).toLowerCase();
+  assert.equal(indiaText.includes("telus"), false);
+  assert.equal(indiaText.includes("amdocs"), false);
+  assert.equal(loadJobsFromDir(jobsDir()).length, 7);
 });
 
 test("loader rejects a public role that still has TODO [CONFIRM]", () => {
@@ -199,6 +220,34 @@ test("draft roles and invalid applications are rejected", async () => {
   assert.deepEqual(ignored, { ok: true });
 });
 
+test("work-authorization country is per-role and defaults to Canada", () => {
+  assert.equal(workAuthCountry(sample()), "CA");
+  assert.equal(workAuthCountry(sample({ workAuthorizationCountry: "IN" })), "IN");
+  assert.equal(countryName("IN"), "India");
+  assert.equal(workAuthLabel("authorized", "IN"), "Authorized to work in India");
+  assert.equal(workAuthLabel("authorized", "CA"), "Authorized to work in Canada");
+  const usDraft = loadSeedJobs().find((job) => job.jobId === "QT-JOB-2026-002");
+  assert.equal(workAuthCountry(usDraft ?? sample()), "US");
+});
+
+test("responsibility headings split into groups without changing ungrouped lists", () => {
+  assert.deepEqual(groupedLines(["Collect XCAL data.", "Support overnight shifts."]), [
+    { items: ["Collect XCAL data.", "Support overnight shifts."] },
+  ]);
+  assert.deepEqual(
+    groupedLines([
+      "Platform Engineering & Operations:",
+      "Provide Day 2 support.",
+      "Vendor & Hardware Management:",
+      "Liaise with HPE and IBM.",
+    ]),
+    [
+      { heading: "Platform Engineering & Operations", items: ["Provide Day 2 support."] },
+      { heading: "Vendor & Hardware Management", items: ["Liaise with HPE and IBM."] },
+    ],
+  );
+});
+
 test("a posted role requires the yes/no work authorization answer; talent network does not", async () => {
   process.env.APPLY_SMTP_HOST = "json";
   process.env.APPLY_SMTP_FROM = "careers-test@example.com";
@@ -220,10 +269,20 @@ test("a posted role requires the yes/no work authorization answer; talent networ
   applied.set("phone", "");
   applied.set("workAuthorization", "no");
   assert.deepEqual(await handleApplication(applied), { ok: true }, "a 'no' answer is still recorded");
+  const canadaRows = await listApplications({ jobId: "QT-JOB-2026-004" });
+  assert.equal(canadaRows[0]?.country, "CA");
 
   const network = baseForm("talent-network");
   network.set("phone", "");
   assert.deepEqual(await handleApplication(network), { ok: true }, "no work-auth question off a posting");
+
+  const indiaApply = baseForm("job");
+  indiaApply.set("jobSlug", "senior-infrastructure-cloud-platform-engineer-openshift-openstack");
+  indiaApply.set("workAuthorization", "yes");
+  assert.deepEqual(await handleApplication(indiaApply), { ok: true }, "India role accepts the same yes/no answer");
+  const indiaRows = await listApplications({ jobId: "QT-JOB-2026-007" });
+  assert.equal(indiaRows[0]?.country, "IN");
+  assert.equal(indiaRows[0]?.workAuthorization, "authorized");
 
   delete process.env.APPLY_SMTP_HOST;
   delete process.env.APPLY_SMTP_FROM;

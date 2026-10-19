@@ -1,5 +1,6 @@
 import { issuesToFieldErrors, type FieldErrors } from "@/lib/apply/schema";
 import { jobFormSchema, type JobFormInput } from "@/lib/jobs/schema";
+import { COUNTRIES, isCountryCode } from "@/lib/taxonomy";
 
 function text(form: FormData, key: string): string {
   const value = form.get(key);
@@ -24,7 +25,8 @@ export function jobFormFromFormData(form: FormData): { data?: JobFormInput; fiel
   const countries = form
     .getAll("workCountries")
     .map((value) => (typeof value === "string" ? value : ""))
-    .filter((value) => value === "US" || value === "CA");
+    .filter((value) => (COUNTRIES as readonly string[]).includes(value));
+  const workAuthorizationCountry = text(form, "workAuthorizationCountry");
 
   const raw = {
     title: text(form, "title"),
@@ -37,6 +39,9 @@ export function jobFormFromFormData(form: FormData): { data?: JobFormInput; fiel
       mode: text(form, "mode"),
     },
     workCountries: countries.length > 0 ? countries : undefined,
+    workAuthorizationCountry: isCountryCode(workAuthorizationCountry)
+      ? workAuthorizationCountry
+      : undefined,
     type: text(form, "type"),
     durationWeeks: duration ? Number(duration) : undefined,
     payRange: payListed

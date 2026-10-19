@@ -45,8 +45,9 @@ export const INDUSTRY_SLUGS = [
 
 export type IndustrySlug = (typeof INDUSTRY_SLUGS)[number];
 
-export const COUNTRIES = ["US", "CA"] as const;
+export const COUNTRIES = ["US", "CA", "IN"] as const;
 export type CountryCode = (typeof COUNTRIES)[number];
+export const DEFAULT_WORK_AUTH_COUNTRY: CountryCode = "CA";
 
 export const LOCATION_MODES = ["Field", "On-site", "Hybrid", "Remote"] as const;
 export type LocationMode = (typeof LOCATION_MODES)[number];
@@ -71,15 +72,24 @@ export const WORK_AUTH_LABELS: Record<WorkAuth, string> = {
   "needs-sponsorship": "Needs sponsorship",
 };
 
+export function isCountryCode(value: string): value is CountryCode {
+  return (COUNTRIES as readonly string[]).includes(value);
+}
+
+/** Country asked on the apply form. Defaults to Canada when a role omits the field. */
+export function workAuthCountry(job: { workAuthorizationCountry?: CountryCode }): CountryCode {
+  return job.workAuthorizationCountry ?? DEFAULT_WORK_AUTH_COUNTRY;
+}
+
 /**
  * Label for a stored work-authorization value. The simplified apply form
- * stores "authorized" / "not-authorized" against the posting's country;
- * rows recorded before 2026-10 hold the legacy three-option values; talent
- * network applications hold "".
+ * stores "authorized" / "not-authorized" against the posting's work-authorization
+ * country; rows recorded before 2026-10 hold the legacy three-option values;
+ * talent network applications hold "".
  */
 export function workAuthLabel(value: string, country: string): string {
   if (value === "authorized" || value === "not-authorized") {
-    const name = country === "US" || country === "CA" ? countryName(country) : "the posting country";
+    const name = isCountryCode(country) ? countryName(country) : "the posting country";
     return value === "authorized" ? `Authorized to work in ${name}` : `Not authorized to work in ${name}`;
   }
   if ((WORK_AUTH as readonly string[]).includes(value)) {
@@ -101,7 +111,14 @@ export function serviceLineFromSlug(slug: string): ServiceLine | undefined {
 }
 
 export function countryName(code: CountryCode): string {
-  return code === "US" ? "United States" : "Canada";
+  switch (code) {
+    case "US":
+      return "United States";
+    case "CA":
+      return "Canada";
+    case "IN":
+      return "India";
+  }
 }
 
 export function modeSlug(mode: LocationMode): string {
