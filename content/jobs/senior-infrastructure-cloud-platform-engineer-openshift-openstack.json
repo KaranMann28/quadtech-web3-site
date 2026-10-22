@@ -1,19 +1,20 @@
 {
   "slug": "senior-infrastructure-cloud-platform-engineer-openshift-openstack",
   "jobId": "QT-JOB-2026-007",
-  "title": "Senior Infrastructure / Cloud Platform Engineer – OpenShift & OpenStack",
+  "title": "Senior Infrastructure / Cloud Platform Engineer (Telecom Cloud)",
   "serviceLine": "Engineering Staffing",
   "industry": "wireless-carriers-oems",
   "location": {
-    "city": "India",
+    "city": "Canada or India",
     "region": "as per project needs",
-    "country": "IN",
+    "country": "CA",
     "mode": "Hybrid"
   },
-  "workAuthorizationCountry": "IN",
+  "workCountries": ["CA", "IN"],
+  "workAuthorizationCountry": ["CA", "IN"],
   "type": "Contract",
   "postedDate": "2026-10-19",
-  "summary": "Senior infrastructure and cloud platform engineer for a national telecom carrier. Deploy, operate, and optimize Red Hat OpenShift and OpenStack platforms that support containerized and cloud-native workloads across private and hybrid cloud. Hands-on Kubernetes, Linux, and infrastructure operations, plus hardware-vendor coordination for platform lifecycle. Hybrid in India as per project needs, and open to candidates authorized to work in India.",
+  "summary": "Senior infrastructure and cloud platform engineer for a national telecom carrier. Deploy, operate, and optimize Red Hat OpenShift and OpenStack platforms that support containerized and cloud-native workloads across private and hybrid cloud. Hands-on Kubernetes, RHEL, NFVi, and infrastructure operations, plus HPE/IBM hardware lifecycle. Hybrid in Canada or India, and open to candidates authorized to work in Canada or India.",
   "responsibilities": [
     "Platform Engineering & Operations:",
     "Provide Day 2 support on the client's Red Hat OpenShift clusters across non-production and production environments.",
@@ -34,13 +35,13 @@
     "Strong hands-on experience with Red Hat OpenShift (installation, operations, upgrades).",
     "Solid experience with Kubernetes concepts and administration.",
     "Experience working with OpenStack (Nova, Neutron, Cinder, Glance, Keystone).",
-    "Strong Linux system administration experience (RHEL/CentOS).",
+    "Strong RHEL system administration experience.",
+    "Experience with HPE/IBM server hardware lifecycle, including diagnostics, RMA and replacement coordination, and firmware compatibility.",
+    "Hands-on NFVi infrastructure experience across controller and compute nodes, including storage, compute, and network integrations.",
+    "Experience with Ansible for automation and configuration management.",
     "Experience troubleshooting complex infrastructure and platform issues in production environments.",
-    "Experience working with enterprise hardware platforms and liaising with vendors such as HPE, IBM, or equivalent for hardware support and replacements.",
-    "Understanding of server, storage, and network dependencies in private cloud environments.",
-    "Experience with automation and configuration management tools such as Ansible.",
     "Exposure to monitoring and logging tools such as Prometheus, Grafana, and ELK.",
-    "Authorized to work in India.",
+    "Authorized to work in Canada or India.",
     "Soft skills:",
     "Strong problem-solving and analytical skills, with the ability to work independently and collaborate across global teams.",
     "Clear communication skills when engaging with vendors, customers, and internal stakeholders.",
@@ -53,7 +54,7 @@
     "Experience working in 24x7 support or on-call environments.",
     "Scripting skills in Bash or Python."
   ],
-  "travel": "Hybrid assignment in India as per project needs. Coordination with vendors, tenants, and field technicians is part of the role.",
+  "travel": "Hybrid assignment in Canada or India as per project needs. Coordination with vendors, tenants, and field technicians is part of the role.",
   "status": "published",
-  "internalNote": "Seeded 2026-10-19 from a client job description for a national telecom carrier assignment. Client and supplier names, pay, and client-internal process names were removed for the public repo. Mode (Hybrid), type (Contract), industry (Wireless Carriers & OEMs), location India, and workAuthorizationCountry IN are as specified. Pay and duration omitted."
+  "internalNote": "Seeded 2026-10-19 and updated 2026-10-22. National telecom carrier assignment. Client and supplier names, pay, personal inboxes, and client-internal process names are not in the public copy. Applications use the on-page form to the same QuadTech careers inbox as other roles. Hybrid, Contract, industry Wireless Carriers & OEMs, location Canada or India, workAuthorizationCountry CA and IN. Pay and duration omitted."
 }

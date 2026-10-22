@@ -13,7 +13,14 @@ import { jobsDir, loadJobsFromDir, loadSeedJobs } from "@/lib/jobs/load";
 import type { PublicJob } from "@/lib/jobs/schema";
 import { jobPostingJsonLd } from "@/lib/jobs/jsonld";
 import { groupedLines } from "@/lib/jobs/filter";
-import { workAuthCountry, workAuthLabel, countryName } from "@/lib/taxonomy";
+import { formatLocation } from "@/lib/jobs/filter";
+import { toPublicJob } from "@/lib/jobs/schema";
+import {
+  formatCountryList,
+  workAuthCountries,
+  workAuthLabel,
+  countryName,
+} from "@/lib/taxonomy";
 
 const sample = (overrides: Partial<PublicJob> = {}): PublicJob => ({
   slug: "sample-role",
@@ -83,20 +90,37 @@ test("published jobs exclude drafts and the template", () => {
   assert.equal(salesforce.length, 3);
   for (const job of salesforce) {
     assert.equal(job.location.country, "CA");
-    assert.equal(workAuthCountry(job), "CA");
+    assert.deepEqual(workAuthCountries(job), ["CA"]);
     assert.equal(job.payRange, undefined);
     assert.ok(!JSON.stringify(job).toLowerCase().includes("karma"), "vendor rewards must not ship");
   }
-  const india = published.find((job) => job.jobId === "QT-JOB-2026-007");
-  assert.ok(india);
-  assert.equal(india.location.country, "IN");
-  assert.equal(india.location.mode, "Hybrid");
-  assert.equal(india.type, "Contract");
-  assert.equal(india.workAuthorizationCountry, "IN");
-  assert.equal(workAuthCountry(india), "IN");
-  const indiaText = JSON.stringify(india).toLowerCase();
-  assert.equal(indiaText.includes("telus"), false);
-  assert.equal(indiaText.includes("amdocs"), false);
+  const telecom = published.find((job) => job.jobId === "QT-JOB-2026-007");
+  assert.ok(telecom);
+  assert.equal(telecom.title, "Senior Infrastructure / Cloud Platform Engineer (Telecom Cloud)");
+  assert.equal(telecom.location.mode, "Hybrid");
+  assert.equal(telecom.type, "Contract");
+  assert.deepEqual(telecom.workCountries, ["CA", "IN"]);
+  assert.deepEqual(telecom.workAuthorizationCountry, ["CA", "IN"]);
+  assert.deepEqual(workAuthCountries(telecom), ["CA", "IN"]);
+  assert.equal(formatCountryList(workAuthCountries(telecom)), "Canada or India");
+  assert.equal(formatLocation(telecom), "Hybrid, Canada or India");
+  const required = telecom.requirements.join(" ");
+  for (const skill of [
+    "Red Hat OpenShift",
+    "OpenStack",
+    "Kubernetes",
+    "RHEL",
+    "HPE/IBM server hardware lifecycle",
+    "NFVi",
+    "Ansible",
+  ]) {
+    assert.ok(required.includes(skill), `missing required skill: ${skill}`);
+  }
+  const publicCopy = JSON.stringify(toPublicJob(telecom)).toLowerCase();
+  assert.equal(publicCopy.includes("telus"), false);
+  assert.equal(publicCopy.includes("amdocs"), false);
+  assert.equal(publicCopy.includes("karan.mann"), false);
+  assert.equal(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(publicCopy), false);
   assert.equal(loadJobsFromDir(jobsDir()).length, 7);
 });
 
@@ -221,13 +245,15 @@ test("draft roles and invalid applications are rejected", async () => {
 });
 
 test("work-authorization country is per-role and defaults to Canada", () => {
-  assert.equal(workAuthCountry(sample()), "CA");
-  assert.equal(workAuthCountry(sample({ workAuthorizationCountry: "IN" })), "IN");
+  assert.deepEqual(workAuthCountries(sample()), ["CA"]);
+  assert.deepEqual(workAuthCountries(sample({ workAuthorizationCountry: ["IN"] })), ["IN"]);
   assert.equal(countryName("IN"), "India");
+  assert.equal(formatCountryList(["CA", "IN"]), "Canada or India");
   assert.equal(workAuthLabel("authorized", "IN"), "Authorized to work in India");
   assert.equal(workAuthLabel("authorized", "CA"), "Authorized to work in Canada");
+  assert.equal(workAuthLabel("authorized", "CA,IN"), "Authorized to work in Canada or India");
   const usDraft = loadSeedJobs().find((job) => job.jobId === "QT-JOB-2026-002");
-  assert.equal(workAuthCountry(usDraft ?? sample()), "US");
+  assert.deepEqual(workAuthCountries(usDraft ?? sample()), ["US"]);
 });
 
 test("responsibility headings split into groups without changing ungrouped lists", () => {
@@ -276,13 +302,13 @@ test("a posted role requires the yes/no work authorization answer; talent networ
   network.set("phone", "");
   assert.deepEqual(await handleApplication(network), { ok: true }, "no work-auth question off a posting");
 
-  const indiaApply = baseForm("job");
-  indiaApply.set("jobSlug", "senior-infrastructure-cloud-platform-engineer-openshift-openstack");
-  indiaApply.set("workAuthorization", "yes");
-  assert.deepEqual(await handleApplication(indiaApply), { ok: true }, "India role accepts the same yes/no answer");
-  const indiaRows = await listApplications({ jobId: "QT-JOB-2026-007" });
-  assert.equal(indiaRows[0]?.country, "IN");
-  assert.equal(indiaRows[0]?.workAuthorization, "authorized");
+  const dualApply = baseForm("job");
+  dualApply.set("jobSlug", "senior-infrastructure-cloud-platform-engineer-openshift-openstack");
+  dualApply.set("workAuthorization", "yes");
+  assert.deepEqual(await handleApplication(dualApply), { ok: true }, "Canada-or-India role accepts the same yes/no answer");
+  const dualRows = await listApplications({ jobId: "QT-JOB-2026-007" });
+  assert.equal(dualRows[0]?.country, "CA,IN");
+  assert.equal(dualRows[0]?.workAuthorization, "authorized");
 
   delete process.env.APPLY_SMTP_HOST;
   delete process.env.APPLY_SMTP_FROM;

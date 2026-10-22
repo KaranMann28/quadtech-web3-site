@@ -25,7 +25,7 @@ The two Phase 1 field/RF files stay drafts. `project-administrator-contractor.js
 
 ## Work authorization country
 
-`workAuthorizationCountry` is the country named on the apply form's yes/no question. It is independent of `location.country`. Omit it to default to Canada so existing roles keep asking about Canada. Set `IN` for India-based roles.
+`workAuthorizationCountry` is the country or countries named on the apply form's yes/no question. It is independent of `location.country`. Accept a single code or an array. Omit it to default to Canada so existing roles keep asking about Canada. Set `["CA", "IN"]` to ask about Canada or India.
 
 ## Seed files
 
@@ -37,6 +37,6 @@ Two draft roles are checked in so the shape is real. They stay drafts until the 
 - `senior-salesforce-functional-lead.json` — `QT-JOB-2026-004` (published, Toronto)
 - `senior-salesforce-technical-lead.json` — `QT-JOB-2026-005` (published, Montreal or Toronto)
 - `senior-bsa-data-migration-specialist-salesforce.json` — `QT-JOB-2026-006` (published, Montreal or Toronto)
-- `senior-infrastructure-cloud-platform-engineer-openshift-openstack.json` — `QT-JOB-2026-007` (published, Hybrid India). `workAuthorizationCountry` is `IN`. Client and supplier names are not in the public copy.
+- `senior-infrastructure-cloud-platform-engineer-openshift-openstack.json` — `QT-JOB-2026-007` (published, Hybrid Canada or India). `workAuthorizationCountry` is `["CA", "IN"]`. Client and supplier names are not in the public copy. Applications use the on-page form, not a personal inbox.
 
 The three Salesforce seeds come from an October 2026 vendor referral list that named only titles, cities, and one opening each. Editorial defaults (Hybrid, Contract, industry `enterprise-venues`) and the generic descriptions are noted in each file's `internalNote` for the owner to adjust in `/admin`. Vendor referral rewards from that list are never published.

@@ -183,10 +183,11 @@ test("import is idempotent and drafts stay off the public board", async () => {
   const openshift = await store.getPublishedJob(
     "senior-infrastructure-cloud-platform-engineer-openshift-openstack",
   );
-  assert.equal(openshift?.workAuthorizationCountry, "IN");
-  assert.equal(openshift?.location.country, "IN");
+  assert.deepEqual(openshift?.workAuthorizationCountry, ["CA", "IN"]);
+  assert.deepEqual(openshift?.workCountries, ["CA", "IN"]);
+  assert.equal(openshift?.title, "Senior Infrastructure / Cloud Platform Engineer (Telecom Cloud)");
   const salesforce = await store.getPublishedJob("senior-salesforce-functional-lead");
-  assert.equal(salesforce?.workAuthorizationCountry, "CA");
+  assert.deepEqual(salesforce?.workAuthorizationCountry, ["CA"]);
 });
 
 test("duplicate assigns a new id and a closed post leaves the public list", async () => {

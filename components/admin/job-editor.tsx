@@ -56,8 +56,8 @@ export function JobEditor({
   const [country, setCountry] = useState(job?.location.country ?? "");
   const [mode, setMode] = useState(job?.location.mode ?? "");
   const [workCountries, setWorkCountries] = useState<string[]>(job?.workCountries ?? []);
-  const [workAuthorizationCountry, setWorkAuthorizationCountry] = useState<string>(
-    job?.workAuthorizationCountry ?? "CA",
+  const [workAuthorizationCountry, setWorkAuthorizationCountry] = useState<string[]>(
+    job?.workAuthorizationCountry ?? ["CA"],
   );
   const [type, setType] = useState(job?.type ?? "");
   const [durationWeeks, setDurationWeeks] = useState(job?.durationWeeks ? String(job.durationWeeks) : "");
@@ -160,7 +160,7 @@ export function JobEditor({
     industry,
     location: { city, region, country, mode },
     workCountries: workCountries.length ? workCountries : undefined,
-    workAuthorizationCountry: workAuthorizationCountry || undefined,
+    workAuthorizationCountry: workAuthorizationCountry.length ? workAuthorizationCountry : undefined,
     type,
     durationWeeks: durationWeeks ? Number(durationWeeks) : undefined,
     payRange: payListed
@@ -254,26 +254,30 @@ export function JobEditor({
             <FieldError error={errors["location.mode"]} />
           </div>
         </div>
-        <div className="grid gap-2">
-          <Label htmlFor="workAuthorizationCountry">Work authorization country *</Label>
-          <NativeSelect
-            id="workAuthorizationCountry"
-            name="workAuthorizationCountry"
-            value={workAuthorizationCountry}
-            onChange={(event) => setWorkAuthorizationCountry(event.target.value)}
-            required
-          >
-            {COUNTRIES.map((code) => (
-              <option key={code} value={code}>
-                {countryName(code)}
-              </option>
-            ))}
-          </NativeSelect>
+        <fieldset className="grid gap-2">
+          <legend className="text-sm font-medium">Work authorization countries *</legend>
+          {COUNTRIES.map((code) => (
+            <label key={code} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name="workAuthorizationCountry"
+                value={code}
+                checked={workAuthorizationCountry.includes(code)}
+                onChange={() =>
+                  setWorkAuthorizationCountry((current) =>
+                    current.includes(code) ? current.filter((item) => item !== code) : [...current, code],
+                  )
+                }
+              />
+              {countryName(code)}
+            </label>
+          ))}
           <p className="text-sm text-muted-foreground">
-            Asked as a yes/no on the apply form. Defaults to Canada for roles that omit it.
+            Asked as a yes/no on the apply form. Defaults to Canada for roles that omit it. Select
+            more than one to ask about any of those countries.
           </p>
           <FieldError error={errors.workAuthorizationCountry} />
-        </div>
+        </fieldset>
         <fieldset className="grid gap-2">
           <legend className="text-sm font-medium">Also open in</legend>
           {COUNTRIES.map((code) => (

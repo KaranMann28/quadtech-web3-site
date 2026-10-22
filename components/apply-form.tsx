@@ -12,7 +12,7 @@ import {
   type FieldErrors,
 } from "@/lib/apply/schema";
 import type { PublicJob } from "@/lib/jobs/schema";
-import { countryName, workAuthCountry } from "@/lib/taxonomy";
+import { formatCountryList, workAuthCountries } from "@/lib/taxonomy";
 
 type Props =
   | { kind: "job"; job: PublicJob }
@@ -79,7 +79,7 @@ export function ApplyForm(props: Props) {
   }, [formError]);
 
   const title = props.kind === "job" ? props.job.title : "Talent network";
-  const authCountry = props.kind === "job" ? countryName(workAuthCountry(props.job)) : null;
+  const authCountry = props.kind === "job" ? formatCountryList(workAuthCountries(props.job)) : null;
 
   function pickResume(file: File | null) {
     setResumeFile(file);

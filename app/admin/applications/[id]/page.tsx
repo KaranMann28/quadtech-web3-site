@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { applicationStatusAction } from "@/lib/admin/actions";
 import { requireAdmin, redirectIfDenied } from "@/lib/admin/guard";
 import { APPLICATION_STATUSES, getApplication } from "@/lib/applications/store";
-import { countryName, isCountryCode, workAuthLabel } from "@/lib/taxonomy";
+import { formatCountryList, parseWorkAuthCountries, workAuthLabel } from "@/lib/taxonomy";
 
 export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,6 +15,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
   const { id } = await params;
   const application = await getApplication(id);
   if (!application) notFound();
+  const applicationCountries = parseWorkAuthCountries(application.country);
 
   return (
     <article className="grid max-w-3xl gap-6">
@@ -42,7 +43,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
         <div>
           <dt className="text-muted-foreground">Country</dt>
           <dd>
-            {isCountryCode(application.country) ? countryName(application.country) : "—"}
+            {applicationCountries ? formatCountryList(applicationCountries) : "—"}
           </dd>
         </div>
         <div>

@@ -35,10 +35,11 @@ const jobContentShape = {
    */
   workCountries: z.array(z.enum(COUNTRIES)).min(1).optional(),
   /**
-   * Country named on the apply form's yes/no work-authorization question.
-   * Defaults to Canada so existing US/Canada seeds stay unchanged unless set.
+   * Countries named on the apply form's yes/no work-authorization question.
+   * A single code or an array is accepted; stored as an array. Omit to default
+   * to Canada so existing roles keep asking about Canada.
    */
-  workAuthorizationCountry: z.enum(COUNTRIES).optional(),
+  workAuthorizationCountry: z.array(z.enum(COUNTRIES)).min(1).optional(),
   type: z.enum(ENGAGEMENT_TYPES, { error: "Select an engagement type." }),
   durationWeeks: z.number().int().positive().optional(),
   payRange: z
@@ -111,5 +112,11 @@ export function normalizeJobInput(raw: unknown): unknown {
     record.status = record.draft ? "draft" : "published";
   }
   delete record.draft;
+  if (typeof record.workAuthorizationCountry === "string") {
+    record.workAuthorizationCountry = record.workAuthorizationCountry
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
   return record;
 }

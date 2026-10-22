@@ -10,7 +10,7 @@
     "country": "US",
     "mode": "Field"
   },
-  "workAuthorizationCountry": "CA",
+  "workAuthorizationCountry": ["CA"],
   "type": "Contract",
   "durationWeeks": 12,
   "payRange": {

@@ -34,11 +34,18 @@ function headingFromLine(item: string): string | undefined {
 }
 
 export function formatLocation(job: PublicJob): string {
-  const countries = jobCountries(job).map(countryName).join(" & ");
+  const names = jobCountries(job).map(countryName);
+  const countryLabel = names.join(" & ");
   if (job.location.mode === "Remote") {
-    return `Remote · ${countries}`;
+    return `Remote · ${countryLabel}`;
   }
-  return `${job.location.city}, ${job.location.region} · ${countries} · ${job.location.mode}`;
+  const cityCoversCountries = names.every((name) =>
+    job.location.city.toLowerCase().includes(name.toLowerCase()),
+  );
+  if (cityCoversCountries) {
+    return `${job.location.mode}, ${job.location.city}`;
+  }
+  return `${job.location.city}, ${job.location.region} · ${countryLabel} · ${job.location.mode}`;
 }
 
 export function formatPay(job: PublicJob): string | undefined {
