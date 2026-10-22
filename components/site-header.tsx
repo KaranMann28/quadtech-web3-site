@@ -12,6 +12,7 @@ const NAV = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
+  { href: "/work", label: "Work" },
   { href: "/industries", label: "Industries" },
   { href: "/why-us", label: "Why Us" },
   { href: "/careers", label: "Careers" },
@@ -38,7 +39,7 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md print:hidden">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8" aria-label="Main">
         <Link href="/" className="flex min-w-0 items-center gap-3 rounded-md">
           <Logo className="size-8 shrink-0 text-accent" />

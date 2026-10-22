@@ -168,3 +168,22 @@
     top: 1rem;
   }
 }
+
+@media print {
+  /* Paper size follows the print dialog so A4 and Letter both fit. */
+  @page {
+    size: auto;
+    margin: 12mm;
+  }
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  .skip-link {
+    display: none !important;
+  }
+  .capabilities-sheet {
+    color: #111111;
+  }
+}

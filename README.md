@@ -47,6 +47,9 @@ See [content/jobs/README.md](content/jobs/README.md). Roles with `draft: true` a
 | Path | Purpose |
 | --- | --- |
 | `/` `/about` `/services` `/why-us` `/contact` | Existing public pages |
+| `/services/das` `/services/public-safety-radio` `/services/field-testing` | Buyer-facing service pages |
+| `/work` | Engagement process, sample report fields, case-study templates |
+| `/capabilities` | Printable one-pager (browser print / Save as PDF) |
 | `/industries` and `/industries/[slug]` | Six customer categories |
 | `/careers` | Job board. One list grouped by service line, with a single search box. |
 | `/careers/[slug]` | Role detail and application |

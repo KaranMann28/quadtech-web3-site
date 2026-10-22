@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { company } from "@/lib/company";
+import { buyerServices } from "@/content/buyer-services";
 import { industries } from "@/lib/industries";
-import { services } from "@/lib/services";
 import { WORDMARK } from "@/lib/site";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="border-t border-border bg-background print:hidden">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <Link href="/" className="mb-4 flex items-center gap-3">
@@ -27,6 +27,8 @@ export function SiteFooter() {
               ["/", "Home"],
               ["/about", "About"],
               ["/services", "Services"],
+              ["/work", "Work"],
+              ["/capabilities", "Capabilities"],
               ["/industries", "Industries"],
               ["/why-us", "Why Us"],
               ["/careers", "Careers"],
@@ -43,10 +45,10 @@ export function SiteFooter() {
         <div>
           <h2 className="mb-4 text-sm font-semibold tracking-wider uppercase">Services</h2>
           <ul className="space-y-2">
-            {services.slice(0, 8).map((service) => (
+            {buyerServices.map((service) => (
               <li key={service.slug}>
                 <Link
-                  href={`/services#${service.slug}`}
+                  href={service.links[0]?.href ?? "/services"}
                   className="text-sm text-muted-foreground hover:text-accent"
                 >
                   {service.name}
