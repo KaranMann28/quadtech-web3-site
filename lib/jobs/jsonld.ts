@@ -1,5 +1,5 @@
 import type { PublicJob } from "@/lib/jobs/schema";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { LOGO_SRC, SITE_NAME, SITE_URL } from "@/lib/site";
 import { countryName } from "@/lib/taxonomy";
 import { groupedLines, jobCountries } from "@/lib/jobs/filter";
 
@@ -54,6 +54,7 @@ export function jobPostingJsonLd(job: PublicJob) {
       "@type": "Organization",
       name: SITE_NAME,
       sameAs: SITE_URL,
+      logo: `${SITE_URL}${LOGO_SRC}`,
     },
     url: `${SITE_URL}/careers/${job.slug}`,
     applicantLocationRequirements: countries.map((code) => ({

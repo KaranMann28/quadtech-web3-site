@@ -41,7 +41,7 @@ export function SiteHeader() {
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8" aria-label="Main">
         <Link href="/" className="flex min-w-0 items-center gap-3 rounded-md">
-          <Logo className="size-8 shrink-0 text-accent" />
+          <Logo className="size-8 shrink-0" preload />
           <span className="gradient-text truncate text-base font-bold tracking-tight sm:text-xl">
             {WORDMARK}
           </span>

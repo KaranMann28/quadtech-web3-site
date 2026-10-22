@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { company } from "@/lib/company";
 import { services } from "@/lib/services";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { LINKEDIN_URL, LOGO_SRC, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const facts = [
   { label: "Founded", value: String(company.founded) },
@@ -18,6 +18,8 @@ export default function HomePage() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
+    logo: `${SITE_URL}${LOGO_SRC}`,
+    sameAs: [LINKEDIN_URL],
     foundingDate: String(company.founded),
     address: company.offices.map((office) => ({
       "@type": "PostalAddress",
