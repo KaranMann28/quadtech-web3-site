@@ -11,7 +11,7 @@ import {
 import { recordApplication } from "@/lib/applications/store";
 import { getPublishedJob } from "@/lib/jobs/store";
 import type { PublicJob } from "@/lib/jobs/schema";
-import { countryName } from "@/lib/taxonomy";
+import { formatCountryList, serializeWorkAuthCountries, workAuthCountries } from "@/lib/taxonomy";
 
 export type ApplyResult =
   | { ok: true }
@@ -48,7 +48,7 @@ function buildEmail(input: {
     `Phone: ${input.phone || "(not provided)"}`,
     `LinkedIn: ${input.linkedin || "(not provided)"}`,
     job && input.workAuthorization
-      ? `Authorized to work in ${countryName(job.location.country)}: ${
+      ? `Authorized to work in ${formatCountryList(workAuthCountries(job))}: ${
           input.workAuthorization === WORK_AUTH_YES ? "Yes" : "No"
         }`
       : null,
@@ -96,7 +96,8 @@ export async function handleApplication(form: FormData): Promise<ApplyResult> {
   const fieldErrors: FieldErrors = parsed.success ? {} : issuesToFieldErrors(parsed.error);
 
   // The yes/no work-authorization question is asked on posted roles only,
-  // for the posting's country. The talent network has no country context.
+  // for the posting's work-authorization country or countries (Canada unless
+  // the role sets another). The talent network has no country context.
   let workAuthorization: "" | typeof WORK_AUTH_YES | typeof WORK_AUTH_NO = "";
   if (job) {
     const answer = text(form, "workAuthorization");
@@ -136,7 +137,7 @@ export async function handleApplication(form: FormData): Promise<ApplyResult> {
       email: parsed.data.email,
       phone: parsed.data.phone,
       linkedin: parsed.data.linkedin,
-      country: job?.location.country ?? "",
+      country: job ? serializeWorkAuthCountries(workAuthCountries(job)) : "",
       workAuthorization,
       serviceLine: job?.serviceLine ?? "General",
       resume,
@@ -177,7 +178,7 @@ export async function handleApplication(form: FormData): Promise<ApplyResult> {
       email: parsed.data.email,
       phone: parsed.data.phone,
       cityRegion: "",
-      country: job?.location.country ?? "",
+      country: job ? serializeWorkAuthCountries(workAuthCountries(job)) : "",
       workAuthorization,
       linkedin: parsed.data.linkedin,
       referral: "",

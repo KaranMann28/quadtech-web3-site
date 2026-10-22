@@ -5,7 +5,9 @@ const phonePattern = /^[+()0-9.\-\s]{7,40}$/;
 /**
  * The application asks for the minimum a recruiter needs: name, email, résumé,
  * and (for a posted role) whether the candidate is authorized to work in the
- * posting's country. Phone and LinkedIn are optional. City, referral, message,
+ * posting's work-authorization country or countries (Canada unless the role
+ * sets another).
+ * Phone and LinkedIn are optional. City, referral, message,
  * and screening questions were dropped in the 2026-10 simplification; their
  * database columns remain for older rows.
  */

@@ -45,8 +45,9 @@ export const INDUSTRY_SLUGS = [
 
 export type IndustrySlug = (typeof INDUSTRY_SLUGS)[number];
 
-export const COUNTRIES = ["US", "CA"] as const;
+export const COUNTRIES = ["US", "CA", "IN"] as const;
 export type CountryCode = (typeof COUNTRIES)[number];
+export const DEFAULT_WORK_AUTH_COUNTRY: CountryCode = "CA";
 
 export const LOCATION_MODES = ["Field", "On-site", "Hybrid", "Remote"] as const;
 export type LocationMode = (typeof LOCATION_MODES)[number];
@@ -71,15 +72,60 @@ export const WORK_AUTH_LABELS: Record<WorkAuth, string> = {
   "needs-sponsorship": "Needs sponsorship",
 };
 
+export function isCountryCode(value: string): value is CountryCode {
+  return (COUNTRIES as readonly string[]).includes(value);
+}
+
+export function parseWorkAuthCountries(raw: string | null | undefined): CountryCode[] | undefined {
+  if (!raw || !raw.trim()) return undefined;
+  const trimmed = raw.trim();
+  if (isCountryCode(trimmed)) return [trimmed];
+  if (trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed) as unknown;
+      if (Array.isArray(parsed)) {
+        const codes = parsed.filter((item): item is CountryCode => typeof item === "string" && isCountryCode(item));
+        return codes.length ? codes : undefined;
+      }
+    } catch {
+      return undefined;
+    }
+  }
+  const codes = trimmed.split(",").map((item) => item.trim()).filter(isCountryCode);
+  return codes.length ? codes : undefined;
+}
+
+export function serializeWorkAuthCountries(codes: CountryCode[] | undefined): string {
+  const list = codes?.length ? codes : [DEFAULT_WORK_AUTH_COUNTRY];
+  return list.length === 1 ? list[0] : list.join(",");
+}
+
+export function workAuthCountries(job: {
+  workAuthorizationCountry?: CountryCode | CountryCode[];
+}): CountryCode[] {
+  const value = job.workAuthorizationCountry;
+  if (Array.isArray(value) && value.length > 0) return value;
+  if (typeof value === "string" && isCountryCode(value)) return [value];
+  return [DEFAULT_WORK_AUTH_COUNTRY];
+}
+
+export function formatCountryList(codes: CountryCode[]): string {
+  const names = codes.map(countryName);
+  if (names.length <= 1) return names[0] ?? countryName(DEFAULT_WORK_AUTH_COUNTRY);
+  if (names.length === 2) return `${names[0]} or ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, or ${names[names.length - 1]}`;
+}
+
 /**
  * Label for a stored work-authorization value. The simplified apply form
- * stores "authorized" / "not-authorized" against the posting's country;
- * rows recorded before 2026-10 hold the legacy three-option values; talent
- * network applications hold "".
+ * stores "authorized" / "not-authorized" against the posting's work-authorization
+ * country or countries; rows recorded before 2026-10 hold the legacy three-option
+ * values; talent network applications hold "".
  */
 export function workAuthLabel(value: string, country: string): string {
   if (value === "authorized" || value === "not-authorized") {
-    const name = country === "US" || country === "CA" ? countryName(country) : "the posting country";
+    const codes = parseWorkAuthCountries(country);
+    const name = codes?.length ? formatCountryList(codes) : "the posting country";
     return value === "authorized" ? `Authorized to work in ${name}` : `Not authorized to work in ${name}`;
   }
   if ((WORK_AUTH as readonly string[]).includes(value)) {
@@ -101,7 +147,14 @@ export function serviceLineFromSlug(slug: string): ServiceLine | undefined {
 }
 
 export function countryName(code: CountryCode): string {
-  return code === "US" ? "United States" : "Canada";
+  switch (code) {
+    case "US":
+      return "United States";
+    case "CA":
+      return "Canada";
+    case "IN":
+      return "India";
+  }
 }
 
 export function modeSlug(mode: LocationMode): string {

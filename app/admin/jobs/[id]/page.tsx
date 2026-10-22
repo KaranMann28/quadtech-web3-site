@@ -15,6 +15,7 @@ function toEditor(job: JobRecord): EditorJob {
     industry: job.industry,
     location: job.location,
     workCountries: job.workCountries,
+    workAuthorizationCountry: job.workAuthorizationCountry,
     type: job.type,
     durationWeeks: job.durationWeeks,
     payRange: job.payRange,

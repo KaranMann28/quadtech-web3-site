@@ -1,7 +1,7 @@
 import type { PublicJob } from "@/lib/jobs/schema";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { countryName } from "@/lib/taxonomy";
-import { jobCountries } from "@/lib/jobs/filter";
+import { groupedLines, jobCountries } from "@/lib/jobs/filter";
 
 function escapeHtml(value: string): string {
   return value
@@ -16,15 +16,25 @@ function employmentType(job: PublicJob): string {
   return "CONTRACTOR";
 }
 
+function htmlList(title: string, items: string[]): string {
+  const groups = groupedLines(items);
+  const parts = [`<h2>${escapeHtml(title)}</h2>`];
+  for (const group of groups) {
+    if (group.heading) parts.push(`<h3>${escapeHtml(group.heading)}</h3>`);
+    parts.push("<ul>");
+    for (const item of group.items) parts.push(`<li>${escapeHtml(item)}</li>`);
+    parts.push("</ul>");
+  }
+  return parts.join("");
+}
+
 export function jobPostingJsonLd(job: PublicJob) {
   const countries = jobCountries(job);
   const description = [
     `<p>${escapeHtml(job.summary)}</p>`,
-    "<h2>Responsibilities</h2><ul>",
-    ...job.responsibilities.map((item) => `<li>${escapeHtml(item)}</li>`),
-    "</ul><h2>Requirements</h2><ul>",
-    ...job.requirements.map((item) => `<li>${escapeHtml(item)}</li>`),
-    "</ul>",
+    htmlList("Responsibilities", job.responsibilities),
+    htmlList("Requirements", job.requirements),
+    job.niceToHave?.length ? htmlList("Nice to have", job.niceToHave) : "",
   ].join("");
 
   const data: Record<string, unknown> = {

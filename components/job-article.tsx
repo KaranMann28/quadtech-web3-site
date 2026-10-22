@@ -1,9 +1,36 @@
 import Link from "next/link";
 import { ApplyForm } from "@/components/apply-form";
 import { getIndustry } from "@/lib/industries";
-import { formatLocation, formatPay, formatPosted } from "@/lib/jobs/filter";
+import { formatLocation, formatPay, formatPosted, groupedLines } from "@/lib/jobs/filter";
 import { jobPostingJsonLd } from "@/lib/jobs/jsonld";
 import type { PublicJob } from "@/lib/jobs/schema";
+
+function GroupedList({
+  title,
+  items,
+  className,
+}: {
+  title: string;
+  items: string[];
+  className: string;
+}) {
+  const groups = groupedLines(items);
+  return (
+    <section className={className}>
+      <h2 className="text-xl font-semibold">{title}</h2>
+      {groups.map((group) => (
+        <div key={group.heading ?? title}>
+          {group.heading ? <h3 className="mt-4 text-base font-semibold">{group.heading}</h3> : null}
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-muted-foreground">
+            {group.items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </section>
+  );
+}
 
 export function JobArticle({
   job,
@@ -108,31 +135,10 @@ export function JobArticle({
               </div>
             ) : null}
           </dl>
-          <section className="mt-10">
-            <h2 className="text-xl font-semibold">Responsibilities</h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-muted-foreground">
-              {job.responsibilities.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-          <section className="mt-8">
-            <h2 className="text-xl font-semibold">Requirements</h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-muted-foreground">
-              {job.requirements.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
+          <GroupedList title="Responsibilities" items={job.responsibilities} className="mt-10" />
+          <GroupedList title="Requirements" items={job.requirements} className="mt-8" />
           {job.niceToHave && job.niceToHave.length > 0 ? (
-            <section className="mt-8">
-              <h2 className="text-xl font-semibold">Nice to have</h2>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-muted-foreground">
-                {job.niceToHave.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
+            <GroupedList title="Nice to have" items={job.niceToHave} className="mt-8" />
           ) : null}
           {job.travel ? (
             <section className="mt-8">

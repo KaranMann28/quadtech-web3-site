@@ -25,15 +25,21 @@ const jobContentShape = {
   location: z.object({
     city: z.string().trim().min(1, "Enter a city.").max(80),
     region: z.string().trim().min(1, "Enter a region.").max(80),
-    country: z.enum(COUNTRIES, { error: "Select the United States or Canada." }),
+    country: z.enum(COUNTRIES, { error: "Select the United States, Canada, or India." }),
     mode: z.enum(LOCATION_MODES, { error: "Select a location mode." }),
   }),
   /**
-   * Optional extra countries for roles open in both the US and Canada.
+   * Optional extra countries for roles open in more than one country.
    * location.country stays the primary country for postal address data.
    * TODO [CONFIRM] how dual-country remote roles should be labeled once a role is published.
    */
   workCountries: z.array(z.enum(COUNTRIES)).min(1).optional(),
+  /**
+   * Countries named on the apply form's yes/no work-authorization question.
+   * A single code or an array is accepted; stored as an array. Omit to default
+   * to Canada so existing roles keep asking about Canada.
+   */
+  workAuthorizationCountry: z.array(z.enum(COUNTRIES)).min(1).optional(),
   type: z.enum(ENGAGEMENT_TYPES, { error: "Select an engagement type." }),
   durationWeeks: z.number().int().positive().optional(),
   payRange: z
@@ -48,7 +54,7 @@ const jobContentShape = {
   postedDate: isoDate,
   closingDate: isoDate.optional(),
   summary: z.string().trim().min(20, "Summary must be at least 20 characters.").max(600),
-  responsibilities: z.array(z.string().trim().min(3)).min(1, "Add at least one responsibility.").max(12),
+  responsibilities: z.array(z.string().trim().min(3)).min(1, "Add at least one responsibility.").max(16),
   requirements: z.array(z.string().trim().min(3)).min(1, "Add at least one requirement.").max(16),
   niceToHave: z.array(z.string().trim().min(3)).max(12).optional(),
   travel: z.string().trim().min(3).max(400).optional(),
@@ -106,5 +112,11 @@ export function normalizeJobInput(raw: unknown): unknown {
     record.status = record.draft ? "draft" : "published";
   }
   delete record.draft;
+  if (typeof record.workAuthorizationCountry === "string") {
+    record.workAuthorizationCountry = record.workAuthorizationCountry
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
   return record;
 }

@@ -23,8 +23,9 @@ model Job {
   region           String
   country          String
   mode             String
-  workCountries    String?
-  engagementType   String
+  workCountries             String?
+  workAuthorizationCountry  String   @default("CA")
+  engagementType            String
   durationWeeks    Int?
   payMin           Float?
   payMax           Float?
